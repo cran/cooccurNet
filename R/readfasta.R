@@ -90,6 +90,11 @@ cooccur.readfasta.read <- function(dataFile="", parallel=FALSE, cpus=cooccur.det
 	#print(dt_idxtable_filename)
 	cooccur.preprocess.object$dt_idxtable_filename = dt_idxtable_filename
 	cooccur.printTimeCost('split string to character time cost',t, debug)
+	
+	#print(dim(cooccur.preprocess.object$matrix))
+	#print(dim(cooccur.preprocess.object$original))
+	
+	
 	return(cooccur.preprocess.object)
 }
 

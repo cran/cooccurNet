@@ -385,4 +385,20 @@ getexample <- function(dataType){
 }
 
 
-
+#'getexample_forRCOS
+#' @title getexample_forRCOS
+#' @description Get the test data for testing RCOS method
+#' @note  File paths for all the files available for testing RCOS. Currently, there is only one file "HA1protein_humanH3N2", the sequences within which are derived from the database of Influenza Virus Resource.
+#' @usage getexample_forRCOS()
+#' @examples
+#' dataFile = getexample_forRCOS()
+#' @return  File paths for all the files available for testing RCOS.
+#' @export
+#'
+getexample_forRCOS <- function(){
+  path = ""
+  path = system.file("extdata", "RCOS", package = "cooccurNet")
+  fileName<-paste(path, dir(path) ,sep="/")
+  #print(path)
+  return(fileName)
+}

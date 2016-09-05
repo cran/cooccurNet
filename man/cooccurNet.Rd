@@ -23,6 +23,8 @@ Index of functions/methods (grouped in a friendly way):
 
 7. getexample(dataType)
 
+8. getexample_forRCOS(dataType)
+
 }
 
 \note{
@@ -118,6 +120,9 @@ Maintainers: Yuanqiang Zou <jerrytsou2001@gmail.com>
 \examples{
   #example of get example data
   dataFile=getexample(dataType="protein")
+  
+  #example of get file paths for all the files available for testing RCOS.
+  #dataFiles = getexample_forRCOS()
 
   #example of readseq()
   #read sequences from the sample fasta file

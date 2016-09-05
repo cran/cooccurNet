@@ -47,6 +47,7 @@ cooccur.dataprepreprocess.preprocess <- function(data=list(), threshold=0.9, par
   #fable<-sfApply(data$freqMatrix, 2, function(x){ifelse(round(max(x)/nrow,5)>=threshold, 1,0)})
   #fable<-apply(data$freqMatrix, 2, function(x){ifelse(round(max(x)/nrow,5)>=threshold, 1,0)})
   #for(i in 1:ncol){
+  #print(threshold)
   i = 1
   foreach::foreach(i =  1:ncol) %do% {
     #print(i)
@@ -61,21 +62,25 @@ cooccur.dataprepreprocess.preprocess <- function(data=list(), threshold=0.9, par
   #print(length(fable)/ncol(data$matrix))
   #print(length(fable))
 
-  if(is.na(memory)==TRUE){
+  #2016-08-30 begin
+  #if(is.na(memory)==TRUE){
     #print(length(fable)/ncol(data$matrix))
     #print(ncol(data$matrix))
-    if(ncol(data$matrix) <= 100){
-      memory="memory"
-    }else if(length(fable)/ncol(data$matrix)<=0.3){
-      memory="sparse"
-    }else{
-      memory="memory"
-    }
-  }
+    #if(ncol(data$matrix) <= 100){
+      #memory="memory"
+    #}else if(length(fable)/ncol(data$matrix)<=0.3){
+      #memory="sparse"
+    #}else{
+      #memory="memory"
+    #}
+  #}
+  #2016-08-30 end 
+ 
+  
+  
+  
 
-  msg = paste('using memory,', memory, sep="")
 
-  cooccur.printTimeCost(msg, t, debug)
 
   if(length(fable)>0){
     data$matrix <- data$matrix[,-fable]
@@ -83,6 +88,20 @@ cooccur.dataprepreprocess.preprocess <- function(data=list(), threshold=0.9, par
     data$original <- data$original[,-fable]
   }
   #sfStop()
+  
+  
+  inmemoryflag = inmemoryflag(nrow(data$matrix), ncol(data$matrix))
+
+  if(is.na(memory)==TRUE){
+    if(inmemoryflag==TRUE){
+      memory="memory"
+    }else{
+      memory="sparse"
+    }
+  }  
+    
+  msg = paste('using memory,', memory, sep="")
+  cooccur.printTimeCost(msg, t, debug)
 
   cooccur.printTimeCost('compareWiththreshold data time cost',t, debug)
   rm(fable)
@@ -126,6 +145,11 @@ cooccur.dataprepreprocess.preprocess <- function(data=list(), threshold=0.9, par
 #' @importFrom   foreach %do%
 #' @importFrom utils memory.size setTxtProgressBar txtProgressBar write.table
 cooccur.dataprepreprocess.bigramfrequence <- function(sequences,colsperIter=20){
+  
+  #print(dim(sequences$matrix))
+  #print(dim(sequences$original))
+  
+  
   if(!requireNamespace("bigmemory", quietly = TRUE)){
     stop("Package 'bigmemory' is required.")
   }
@@ -141,14 +165,16 @@ cooccur.dataprepreprocess.bigramfrequence <- function(sequences,colsperIter=20){
   #cooccur.printTimeCost('cooccur.dataprepreprocess.bigramfrequence',t1,debug)
 
   #print(len)
-  colsperIter = 20
-  if(len<2001){
-    colsperIter = 200
-  }else if(len<100001){
-    colsperIter = 10000
-  }else if(len<1000001){
-    colsperIter = 20
-  }
+  
+  #2016-09-05
+  colsperIter = 50
+  #if(len<2001){
+    #colsperIter = 200
+  #}else if(len<100001){
+    #colsperIter = 10000
+  #}else if(len<1000001){
+    #colsperIter = 20
+  #}
   Iter = ceiling(len / colsperIter)
   start <- 1
   end <- 1
@@ -176,10 +202,14 @@ cooccur.dataprepreprocess.bigramfrequence <- function(sequences,colsperIter=20){
     #print(dim(sequences$matrix[,i]))
     xx = matrix(nrow=nrow, ncol=length(i))
     storage.mode(xx) <- "integer"
-
+    
+    
+ 
+    #2016-09-04
+    #xx <- paste(sequences$original[,i], sequences$original[,j],sep = "")
     #xx =  big.matrix(nrow=nrow, ncol=length(i), init=NA, dimnames=list(NULL,1:length(i)))
     xx =   (round( sequences$matrix[,i] / sequences$matrix[,j],5) + sequences$matrix[,i]) * 100000
-	#xx =    sequences$matrix[,i] * sequences$matrix[,j] + sequences$matrix[,i] 
+	  #xx =    sequences$matrix[,i] * sequences$matrix[,j] + sequences$matrix[,i] 
     xx = apply(xx,2, function(x){sequences$constantList$biseqlevel[match(x, sequences$constantList$biseqidlevel)]})
     #sequences$constantList$biseqlevel[match(aa, sequences$constantList$biseqidlevel)]
 

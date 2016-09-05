@@ -47,7 +47,7 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 			file.remove(propertyfile)
 		}
 		header = list()
-		header$h = "name	Connectivity	Diameter	Radius	ConnectionEffcient"
+		header$h = "name  Connectivity  Diameter  Radius  Clustering Coefficient"
 		cooccur.writetable(header$h,propertyfile)
 	}
 
@@ -66,9 +66,13 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 	message("")
 
 	df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences,alpha,steps)
-	if(sequences$memory=="sparse") {
+	
+	#print(df_cooccurrence)
+	
+	#2016-08-31
+	#if(sequences$memory=="sparse") {
 		steps = steps + 1
-	}
+	#}
 	colnames(df_cooccurrence) =seq(1:ncol(df_cooccurrence))
 	rownames(df_cooccurrence) = seq(1:nrow(sequences$matrix))
 
@@ -164,14 +168,31 @@ cooccur.gennetework.cooccurnetworks <- function(sequences, alpha=0.9, steps){
 	}
 	t = Sys.time()
 	if(sequences$memory=="memory"){
-
+	  #2016-08-30
+	  
+	  if(!is.na(steps)){
+	    steps = steps+1
+	    cat(sprintf("%s. calculating networks ......", steps))
+	    message("")
+	  }	  
+	  
+	  pb <- txtProgressBar(style = 3)
+	  progress = seq(0,1, 1/(nrow(sequences$dt_idxtable)-1))
+	  
 		df_cooccurrence <- data.frame()
 		cooccurrenceList = c()
 		for(i in 1:nrow(sequences$dt_idxtable)){
 			rowx = sequences$dt_idxtable[i,]
+			
 			cooccurrence = cooccur.gennetework.calucation(rowx,alpha,sequences)
 			cooccurrenceList = c(cooccurrenceList,list(cooccurrence))
+			
+			#2016-08-30
+			setTxtProgressBar(pb, progress[i])
 		}
+		#2016-08-30
+		close(pb)
+		
 		df_cooccurrence <- t(do.call(rbind, cooccurrenceList))
 		#cooccur.printTimeCost('cooccur.gennetework.cooccurnetworks time cost',t,debug)
 		return(df_cooccurrence)
@@ -265,8 +286,11 @@ cooccur.gennetework.calucation <- function(rowx, alpha=0.9,sequences){
 		#print(sqrt(alpha*x*y))
 		corrrr = ((xy))^2/xMy
 	}
+	
+	#print(corrrr)
 	corrrry = ifelse(corrrr>=alpha, 1, 0)
 	cooccurrenceList= c(cooccurrenceList, corrrry)
+
 	return(cooccurrenceList)
 }
 
@@ -435,7 +459,9 @@ cooccur.gennetework.outputNetWorkProperties <- function(rowid,sequences,df_coocc
 		#properties$Entropy = round(entropy,6)
 		########################################
 		################ConnectionEffcient######
-		properties$ConnectionEffcient = round(igraph::transitivity(df.g),6)
+		#######clustering coefficient###########
+		##2016-08-31
+		properties$clusteringCoefficient = round(igraph::transitivity(df.g),6)
 		########################################
 
 

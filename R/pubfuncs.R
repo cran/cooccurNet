@@ -39,7 +39,9 @@ cooccur.geneColumnCombination.bigmemory <- function(ncol,filename,memory){
 	}
   gc()
 
-  if(memory=="sparse"){
+  #2016-09-04
+  if(memory=="sparsex"){
+  #if(memory=="sparse"){
   	#print(filename)
   	binfile = paste(filename, ".bin", sep="")
   	descfile = paste(filename, ".desc", sep="")
@@ -59,7 +61,9 @@ cooccur.geneColumnCombination.bigmemory <- function(ncol,filename,memory){
   	dt_idxtable[,3] = as.vector(unlist(sapply(2:(ncol),function(x) a <- x : ncol )))
   	return(dt_idxtable)
 
-  }else if(memory=="memory"){
+  #2016-09-04
+  #}else if(memory=="memory"){
+  }else{
     nrow = ncol * (ncol - 1) / 2
     dt_idxtable <- bigmemory::big.matrix(nrow=nrow, ncol=3, type="integer", init=NA, dimnames=list(NULL,1:3))
 
@@ -70,6 +74,46 @@ cooccur.geneColumnCombination.bigmemory <- function(ncol,filename,memory){
   }
 	#print(storage.mode(dt_idxtable))
 
+}
+
+cooccur.geneColumnCombination.bigmemory.old <- function(ncol,filename,memory){
+  #require(bigmemory)
+  if(!requireNamespace("bigmemory", quietly = TRUE)){
+    stop("Package 'bigmemory' is required.")
+  }
+  gc()
+  
+  if(memory=="sparse"){
+    #print(filename)
+    binfile = paste(filename, ".bin", sep="")
+    descfile = paste(filename, ".desc", sep="")
+    
+    if(file.exists(binfile)){
+      file.remove(binfile)
+    }
+    if(file.exists(descfile)){
+      file.remove(descfile)
+    }
+    
+    nrow = ncol * (ncol - 1) / 2
+    dt_idxtable <- bigmemory::filebacked.big.matrix(nrow=nrow, ncol=3, type="integer", init=NA, dimnames=list(NULL,1:3), backingfile=binfile, descriptorfile=descfile)
+    
+    dt_idxtable[,1] = seq(1,nrow)
+    dt_idxtable[,2] = as.vector(unlist(sapply(seq_len(ncol-1),function(x) a <- rep(x, times=(ncol-x)))))
+    dt_idxtable[,3] = as.vector(unlist(sapply(2:(ncol),function(x) a <- x : ncol )))
+    return(dt_idxtable)
+    
+  }else if(memory=="memory"){
+    nrow = ncol * (ncol - 1) / 2
+    dt_idxtable <- bigmemory::big.matrix(nrow=nrow, ncol=3, type="integer", init=NA, dimnames=list(NULL,1:3))
+    
+    dt_idxtable[,1] = seq(1,nrow)
+    dt_idxtable[,2] = as.vector(unlist(sapply(seq_len(ncol-1),function(x) a <- rep(x, times=(ncol-x)))))
+    dt_idxtable[,3] = as.vector(unlist(sapply(2:(ncol),function(x) a <- x : ncol )))
+    return(dt_idxtable)
+  }
+  #print(storage.mode(dt_idxtable))
+  
 }
 
 
@@ -196,5 +240,19 @@ cooccur.cooccurFilter <- function(cooccurFilter,dataType){
   #print(sprintf("cooccurFilter:%s",cooccurFilter))
   return(cooccurFilter)
   
+}
+
+#' @importFrom utils memory.limit 
+inmemoryflag <- function(nrow, ncol){
+  alpha = 0.5
+  memsize = memory.limit()
+  pred = 12 * nrow * ncol * (ncol - 1) / 1024 / 1024
+  #print(pred)
+  #print(memsize *alpha)
+  if(pred >= memsize *alpha){
+    return(FALSE)
+  }else{
+    return(TRUE)
+  }
 }
 

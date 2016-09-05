@@ -1,7 +1,7 @@
 Package: cooccurNet
 Type: Package
 Title: Co-Occurrence Network
-Version: 0.1.0
+Version: 0.1.1
 Depends: R (>= 3.2.0)
 Imports: seqinr, igraph, bigmemory, Matrix, data.table, foreach
 Author: Yuanqiang Zou <jerrytsou2001@gmail.com>, Yousong Peng <pys2013@hnu.edu.cn> and Taijiao Jiang <taijiao@moon.ibp.ac.cn>
@@ -11,6 +11,6 @@ License: GPL-3
 LazyData: TRUE
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-08-22 15:13:36 UTC; Jerry
+Packaged: 2016-09-05 14:30:15 UTC; Jerry
 Repository: CRAN
-Date/Publication: 2016-08-22 20:43:40
+Date/Publication: 2016-09-05 17:23:05
