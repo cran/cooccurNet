@@ -3,7 +3,7 @@
 \title{cooccurNet: Co-Occurrence network computation for R}
 
 \description{
-Read and preprocess fasta format data, and construct the co-occurrence network for downstream analyses. This R package is to construct the co-occurrence network with the algorithm developed by Du (Du 2008). It could be used to transform the data with high-dimension, such as DNA or protein sequence, into co-occurrence networks. Co-occurrence network could not only capture the co-variation pattern between variables, such as the positions in DNA or protein sequences, but also reflect the relationship between samples. Although it is originally used in DNA and protein sequences, it could be also used to other kinds of data, such as SNP.
+Read and preprocess fasta format data, and construct the co-occurrence network for downstream analyses. This R package is to construct the co-occurrence network with the algorithm developed by Du (2008) <DOI:10.1101/gr.6969007>. It could be used to transform the data with high-dimension, such as DNA or protein sequence, into co-occurrence networks. Co-occurrence network could not only capture the co-variation pattern between variables, such as the positions in DNA or protein sequences, but also reflect the relationship between samples. Although it is originally used in DNA and protein sequences, it could be also used to other kinds of data, such as SNP.
 }
 
 \details{
@@ -120,7 +120,7 @@ Maintainers: Yuanqiang Zou <jerrytsou2001@gmail.com>
 \examples{
   #example of get example data
   dataFile=getexample(dataType="protein")
-  
+
   #example of get file paths for all the files available for testing RCOS.
   #dataFiles = getexample_forRCOS()
 

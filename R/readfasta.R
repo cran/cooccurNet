@@ -30,8 +30,17 @@ cooccur.readfasta.read <- function(dataFile="", parallel=FALSE, cpus=cooccur.det
 	sequences = c()
 
 	t = Sys.time()
-	sequences <- data.table::fread(dataFile, header = FALSE, na.strings = "NA")
-	sequences <-  sequences$V1
+
+	#2016-09-14 modified begin
+	#sequences <- data.table::fread(dataFile, header = FALSE, na.strings = "NA")
+	#sequences <-  sequences$V1
+	#2016-09-14 modified
+	fo = file(dataFile,'r')
+	sequences <- readLines(fo)
+	close(fo)
+	#sequences <- as.data.frame(sequences,stringsAsFactors=FALSE)
+	#sequences <- sequences$sequences
+	#2016-09-14 modified end
 
 	cooccur.printTimeCost('reading sequence from file time cost',t,debug)
 	#
@@ -40,7 +49,12 @@ cooccur.readfasta.read <- function(dataFile="", parallel=FALSE, cpus=cooccur.det
 	ind <- which(substr(sequences, 1L, 1L) == ">")
 
 	xnames = sequences[ind]
+
+	#2016-09-14 modified begin
 	xnames = substr(xnames, 2, nchar(xnames))
+	xx = substr(xnames, (regexpr("\\|", xnames) + 1), nchar(xnames))
+	xnames = substr(xx,1, (ifelse(regexpr("\\|", xx)==-1,nchar(xx),regexpr("\\|", xx)) - 1))
+	#2016-09-14 modified end
 	cooccur.preprocess.object$xnames = xnames
 
 	nseq <- length(ind)
@@ -90,11 +104,11 @@ cooccur.readfasta.read <- function(dataFile="", parallel=FALSE, cpus=cooccur.det
 	#print(dt_idxtable_filename)
 	cooccur.preprocess.object$dt_idxtable_filename = dt_idxtable_filename
 	cooccur.printTimeCost('split string to character time cost',t, debug)
-	
+
 	#print(dim(cooccur.preprocess.object$matrix))
 	#print(dim(cooccur.preprocess.object$original))
-	
-	
+
+
 	return(cooccur.preprocess.object)
 }
 
