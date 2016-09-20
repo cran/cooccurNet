@@ -11,9 +11,9 @@ cooccur.readfasta.read <- function(dataFile="", parallel=FALSE, cpus=cooccur.det
 		stop("Package 'seqinr' is required.")
 	}
 
-	if(!requireNamespace("data.table", quietly = TRUE)){
-		stop("Package 'data.table' is required.")
-	}
+	#if(!requireNamespace("data.table", quietly = TRUE)){
+		#stop("Package 'data.table' is required.")
+	#}
 
 	#if(!requireNamespace("snowfall", quietly = TRUE)){
 		#stop("Package 'snowfall' is required.")

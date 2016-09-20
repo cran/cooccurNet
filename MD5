@@ -1,11 +1,11 @@
-2d12927206e5dd4f002f7c6427ac2eb8 *DESCRIPTION
+4394d5a7a659a86b5b142c13f32aa1f7 *DESCRIPTION
 d0efc01b3d97c7e5dfd5409f6e40da06 *NAMESPACE
 9f8f5154ada0e41ac9fcea9072360c0d *R/cooccurrence.R
-87663bacea0bee46f7912ce582b71747 *R/datapreprocess.R
-29ada5730999db70bc008bef53685e97 *R/gennetwork.R
-49a3d745673f55ecc0dd838c5f2a2636 *R/networkpvalue.R
-3d68927d315ec3981d158cca98471906 *R/pubfuncs.R
-3f39465eb5eeccf646db0af3f41c959b *R/readfasta.R
+da10f6ddc2b4d7227cc7dbbd3b487d04 *R/datapreprocess.R
+8a2753c0a61f006648478a484733c228 *R/gennetwork.R
+502892f1ca2bc7a4b929fb92b7e11878 *R/networkpvalue.R
+1fd7f39926d94f6a9c3553828e43799f *R/pubfuncs.R
+508eaf3dba1a26308814e1a1a86b4a16 *R/readfasta.R
 223ad0285852a3838ca683faa2168305 *inst/extdata/DNA
 8a04a27cb41891f86ff01a9db8ac7285 *inst/extdata/RCOS/HA1protein_humanH3N2
 0f38257bfcf19274a9010c36724e9745 *inst/extdata/SNP

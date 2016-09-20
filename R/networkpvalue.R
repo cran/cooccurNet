@@ -1,7 +1,8 @@
 
 #' @importFrom   foreach %do%
-cooccur.networkpvalue.calculateNetWorkPvalue <- function(cooccurrence, sequences, ptimes = 100,alpha=0.9,parallel=FALSE,cpus=cooccur.detectCores(),filterfile=NA,rawfile=NA,modulefile=NA, propertyfile=NA, cooccurfile=NA){
-	if(!requireNamespace("Matrix", quietly = TRUE)){
+cooccur.networkpvalue.calculateNetWorkPvalue <- function(cooccurrence, sequences, ptimes = 100,alpha=0.9, debug=FALSE){
+#cooccurrence, sequences, ptimes, alpha, debug
+  if(!requireNamespace("Matrix", quietly = TRUE)){
 		stop("Package 'Matrix' is required.")
 	}
 	if(!requireNamespace("foreach", quietly = TRUE)){
@@ -18,11 +19,11 @@ cooccur.networkpvalue.calculateNetWorkPvalue <- function(cooccurrence, sequences
 		steps = steps + 1
 		cat(sprintf("    calculating shuffled network (%s) ......", steps))
 		message("")
-		sequences$matrix <- cooccur.networkpvalue.shuffleMatrix(sequences)
+		sequences$matrix <- cooccur.networkpvalue.shuffleMatrix(sequences,debug)
 		if(sequences$memory == "memory"){
-			sequences$bigramFreqList <- cooccur.dataprepreprocess.bigramfrequence(sequences,colsperIter=20)
+			sequences$bigramFreqList <- cooccur.dataprepreprocess.bigramfrequence(sequences)
 		}
-		cooccurr <- cooccur.networkpvalue.networkcooccurrence(sequences,alpha,parallel,cpus)
+		cooccurr <- cooccur.networkpvalue.networkcooccurrence(sequences,alpha,debug)
 		#print(dim(cooccurr))
 		#cooccurrence = cbind(cooccurrence,cooccurr)
 		cooccurrence = Matrix::cBind(cooccurrence,cooccurr)
@@ -40,16 +41,17 @@ cooccur.networkpvalue.calculateNetWorkPvalue <- function(cooccurrence, sequences
 
 
 
-
-cooccur.networkpvalue.networkcooccurrence <- function(sequences,alpha=0.9,parallel=FALSE,cpus=cooccur.detectCores()){
+#sequences,alpha,debug
+cooccur.networkpvalue.networkcooccurrence <- function(sequences,alpha=0.9,debug=FALSE){
 	cooccurrence = c()
-	df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences,steps=NA)
+	#sequences, alpha=0.9, steps, debug=FALSE
+	df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences, alpha, steps=NA, debug)
 	colnames(df_cooccurrence) =seq(1:ncol(df_cooccurrence))
 	rownames(df_cooccurrence) = seq(1:nrow(sequences$matrix))
 	#cooccurrence <- lapply(seq_len(ncol(df_cooccurrence)), cooccur.networkpvalue.getcooccurrence, sequences, df_cooccurrence)
 	#cooccurrence = do.call("rbind",cooccurrence)
 
-	cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence, shuffeld=TRUE)
+	cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence, shuffeld=TRUE, debug)
 
 	return(cooccurrence)
 }
@@ -72,13 +74,15 @@ cooccur.networkpvalue.getcooccurrence.old <- function(colid,sequences,df_cooccur
 }
 
 
-cooccur.networkpvalue.shuffleMatrix <- function(sequences){
+cooccur.networkpvalue.shuffleMatrix <- function(sequences,debug=FALSE){
+  t = as.character(Sys.time())
 	nrow = nrow(sequences$matrix)
 	smatrix = apply(sequences$matrix,2, function(x){
 		nrow = length(x)
 		x = x[sample(seq_len(nrow),nrow,replace=FALSE)]
 	})
 	#print(smatrix)
+	cooccur.printTimeCost('cooccur.networkpvalue.shuffleMatrix time cost',t,debug)
 	return(smatrix)
 }
 

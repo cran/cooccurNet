@@ -24,7 +24,7 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 			file.remove(rawfile)
 		}
 	}
-	
+
 	if(!is.na(modulefile)){
 	  sequences$moduleFile = modulefile
 		if(file.exists(modulefile)){
@@ -65,10 +65,11 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 
 	message("")
 
-	df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences,alpha,steps)
-	
-	#print(df_cooccurrence)
-	
+	df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences,alpha,steps,debug)
+
+	#2016-09-19
+	#print((df_cooccurrence))
+
 	#2016-08-31
 	#if(sequences$memory=="sparse") {
 		steps = steps + 1
@@ -114,14 +115,14 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 		cat("completed")
 	}
 	message("")
-	
+
 	if(!is.na(cooccurfile)){
 		cooccurrence = list()
 		steps = steps+1
 		cat(sprintf("%s. creating siteCoFile file (%s) ......",steps, cooccurfile))
 		#t = Sys.time()
 		#cooccurrence <- lapply(seq_len(ncol(df_cooccurrence)), cooccur.gennetework.outputNetWorkcooccurrence, sequences, df_cooccurrence)
-		cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence)
+		cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence, shuffeld=FALSE, debug)
 		#print(cooccurrence)
 		#cooccur.printTimeCost('create cooccurrence cooccurrence time cost',t,debug)
 		t = Sys.time()
@@ -140,7 +141,8 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 		#if(length(cooccurrence)==0){
 			#cooccurrence <- lapply(seq_len(ncol(df_cooccurrence)), cooccur.gennetework.outputNetWorkcooccurrence, sequences, df_cooccurrence)
 			#print("-----------------------------------------------------------------------------------------")
-			cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence)
+			#sequences,df_cooccurrence,shuffeld=FALSE, debug
+		  cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence, shuffeld=FALSE, debug)
 			#print(cooccurrence)
 		#}#else{
 			#cooccurrence = do.call("rbind", cooccurrence)
@@ -148,7 +150,8 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 
 		colnames(cooccurrence) = c("Site_i","Site_j","Cooccur")
 		t = Sys.time()
-		pvalues = cooccur.networkpvalue.calculateNetWorkPvalue(cooccurrence, sequences, ptimes, alpha)
+		#cooccurrence, sequences, ptimes = 100,alpha=0.9, debug=FALSE
+		pvalues = cooccur.networkpvalue.calculateNetWorkPvalue(cooccurrence, sequences, ptimes, alpha, debug)
 		cooccur.printTimeCost('create cooccurrence p-value time cost',t,debug)
 		t = Sys.time()
 		cooccur.writetable(pvalues,pvaluefile)
@@ -162,100 +165,198 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 
 
 #' @importFrom   foreach %do%
-cooccur.gennetework.cooccurnetworks <- function(sequences, alpha=0.9, steps){
+cooccur.gennetework.cooccurnetworks <- function(sequences, alpha=0.9, steps, debug=FALSE){
 	if(!requireNamespace("foreach", quietly = TRUE)){
 		stop("Package 'foreach' is required.")
 	}
-	t = Sys.time()
+
+  if(!requireNamespace("parallel", quietly = TRUE)){
+    stop("Package 'parallel' is required.")
+  }
+
+	t = as.character(Sys.time())
 	if(sequences$memory=="memory"){
 	  #2016-08-30
-	  
+	  #print(alpha)
 	  if(!is.na(steps)){
 	    steps = steps+1
 	    cat(sprintf("%s. calculating networks ......", steps))
 	    message("")
-	  }	  
-	  
+	  }
+
 	  pb <- txtProgressBar(style = 3)
 	  progress = seq(0,1, 1/(nrow(sequences$dt_idxtable)-1))
-	  
+
 		df_cooccurrence <- data.frame()
 		cooccurrenceList = c()
 		for(i in 1:nrow(sequences$dt_idxtable)){
 			rowx = sequences$dt_idxtable[i,]
-			
+
 			cooccurrence = cooccur.gennetework.calucation(rowx,alpha,sequences)
+
+			#print(cooccurrence)
+
 			cooccurrenceList = c(cooccurrenceList,list(cooccurrence))
-			
+
 			#2016-08-30
 			setTxtProgressBar(pb, progress[i])
 		}
 		#2016-08-30
 		close(pb)
-		
+
 		df_cooccurrence <- t(do.call(rbind, cooccurrenceList))
 		#cooccur.printTimeCost('cooccur.gennetework.cooccurnetworks time cost',t,debug)
 		return(df_cooccurrence)
-	}else if(sequences$memory=="sparse"){
+	#2016-09-19
+	}else if(sequences$memory=="sparsex"){
 		nrow = nrow(sequences$matrix)
 		#df_cooccurrence = sparseMatrix(nrow, nrow(sequences$dt_idxtable), x=0)
-		df_cooccurrence = Matrix::Matrix(nrow=nrow,ncol=0,sparse=TRUE)
+		bbbb = Matrix::Matrix(nrow=nrow,ncol=0,sparse=TRUE)
 		if(!is.na(steps)){
 			steps = steps+1
 			cat(sprintf("%s. calculating networks ......", steps))
 			message("")
 		}
 
-		pb <- txtProgressBar(style = 3)
-		progress = seq(0,1, 1/(nrow(sequences$dt_idxtable)-1))
 
-		#for(n in 1:nrow(sequences$dt_idxtable)){
-		n = 1
-		foreach::foreach(n =  1:nrow(sequences$dt_idxtable)) %do% {
-			#print(n)
-			rowx = sequences$dt_idxtable[n,]
-			i <- rowx[2]
-			j <- rowx[3]
-			#i <- as.numeric(rowx[2])
-			#j <- as.numeric(rowx[3])
-			x = round(sequences$freqMatrix[,i]/nrow,5)
-			y = round(sequences$freqMatrix[,j]/nrow,5)
-			xMy = x * y
-			xy = sqrt(alpha * xMy)
+		M = 1:nrow(sequences$dt_idxtable)
+		cl <- parallel::makeCluster(4)
+		#print("parallel::makeCluster(4)")
+		#df_cooccurrence<-	parallel::parLapply(cl, M, cooccur.gennetework.calculateCooccur, pb, progress,sequences$dt_idxtable, sequences$freqMatrix, sequences$matrix, sequences$constantList$biseqlevel, df_cooccurrence)
+		bbbb <-	parallel::parLapply(cl, M, cooccur.gennetework.calculateCooccur, nrow, alpha, sequences$dt_idxtable, sequences$freqMatrix, sequences$matrix, sequences$constantList$biseqlevel, sequences$constantList$biseqidlevel)
 
+		#bbbb <-	lapply(M, cooccur.gennetework.calculateCooccur, pb, progress, nrow, alpha, sequences$dt_idxtable, sequences$freqMatrix, sequences$matrix, sequences$constantList$biseqlevel, sequences$constantList$biseqidlevel, df_cooccurrence)
+		parallel::stopCluster(cl)
 
-			a = sequences$matrix[,i]
-			b = sequences$matrix[,j]
-			xx =   (round( a / b, 5) + a ) * 100000
-			#xx =    a * b  + a 
-			#xx =   (round( sequences$matrix[,i] / sequences$matrix[,j],3) + sequences$matrix[,i]) * 1000
-			xx = sequences$constantList$biseqlevel[match(xx, sequences$constantList$biseqidlevel)]
+		#df_cooccurrence <- do.call(cbind, df_cooccurrence)
 
-
-			aa = table(xx)[xx]
-			aa = as.vector(round(aa/nrow,5)	)
-			bb = (which(aa>=xy))
-
-			m2 =  Matrix::Matrix(0,nrow=nrow,ncol=1,sparse=TRUE)
-			if(length(bb)>1){
-				#t = Sys.time()
-				#df_cooccurrence[bb,n] = 1
-
-				m2[bb,1]= 1
-
-
-				#print(length(bb))
-				#cooccur.printTimeCost('insert into df_cooccurrence',t,debug)
-			}
-			df_cooccurrence <-  Matrix::cBind(df_cooccurrence, m2)
-			setTxtProgressBar(pb, progress[n])
+		df_cooccurrence = Matrix::Matrix(nrow=nrow,ncol=0,sparse=TRUE)
+		for(n in  1:length(bbbb)) {
+		  df_cooccurrence = Matrix::cBind(df_cooccurrence,bbbb[[n]])
 		}
-		close(pb)
-		#cooccur.printTimeCost('cooccur.gennetework.cooccurnetworks time cost',t,debug)
+
+
+
+
+    #print(dim(df_cooccurrence))
+    #print(debug)
+		cooccur.printTimeCost("cooccur.gennetework.cooccurnetworks time cost",t,debug)
 		return(df_cooccurrence)
+	}else if(sequences$memory=="sparse"){
+	  #print(alpha)
+	  nrow = nrow(sequences$matrix)
+	  #df_cooccurrence = sparseMatrix(nrow, nrow(sequences$dt_idxtable), x=0)
+	  df_cooccurrence = Matrix::Matrix(nrow=nrow,ncol=0,sparse=TRUE)
+	  if(!is.na(steps)){
+	    steps = steps+1
+	    cat(sprintf("%s. calculating networks ......", steps))
+	    message("")
+	  }
+
+	  pb <- txtProgressBar(style = 3)
+	  progress = seq(0,1, 1/(nrow(sequences$dt_idxtable)-1))
+
+	  #for(n in 1:nrow(sequences$dt_idxtable)){
+	  n = 1
+	  foreach::foreach(n =  1:nrow(sequences$dt_idxtable)) %do% {
+	    #print(n)
+	    rowx = sequences$dt_idxtable[n,]
+	    i <- rowx[2]
+	    j <- rowx[3]
+	    #i <- as.numeric(rowx[2])
+	    #j <- as.numeric(rowx[3])
+	    x = round(sequences$freqMatrix[,i]/nrow,5)
+	    y = round(sequences$freqMatrix[,j]/nrow,5)
+	    xMy = x * y
+	    xy = sqrt(alpha * xMy)
+
+
+	    a = sequences$matrix[,i]
+	    b = sequences$matrix[,j]
+	    xx =   (round( a / b, 5) + a ) * 100000
+	    #xx =    a * b  + a
+	    #xx =   (round( sequences$matrix[,i] / sequences$matrix[,j],3) + sequences$matrix[,i]) * 1000
+	    xx = sequences$constantList$biseqlevel[match(xx, sequences$constantList$biseqidlevel)]
+
+	    #print(xx)
+
+	    aa = table(xx)[xx]
+
+	    aa = as.vector(round(aa/nrow,5)	)
+	    bb = (which(aa>=xy))
+
+	    #print(bb)
+
+	    m2 =  Matrix::Matrix(0,nrow=nrow,ncol=1,sparse=TRUE)
+	    if(length(bb)>=1){
+	      #t = Sys.time()
+	      #df_cooccurrence[bb,n] = 1
+
+	      m2[bb,1]= 1
+
+
+	      #print(length(bb))
+	      #cooccur.printTimeCost('insert into df_cooccurrence',t,debug)
+	    }
+
+	    #print(m2[,])
+
+	    df_cooccurrence <-  Matrix::cBind(df_cooccurrence, m2)
+	    setTxtProgressBar(pb, progress[n])
+	  }
+	  close(pb)
+	  cooccur.printTimeCost('cooccur.gennetework.cooccurnetworks time cost',t,debug)
+	  return(df_cooccurrence)
 	}
 }
 
+
+#2016-09-19
+cooccur.gennetework.calculateCooccur  <- function(n, nrow, alpha,  dt_idxtable, freqMatrix, matrix, biseqlevel, biseqidlevel){
+    #message("asdfasdfasd")
+    #print(n)
+    rowx = dt_idxtable[n,]
+    i <- rowx[2]
+    j <- rowx[3]
+    #print(rowx)
+    #i <- as.numeric(rowx[2])
+    #j <- as.numeric(rowx[3])
+    x = round(freqMatrix[,i]/nrow,5)
+    y = round(freqMatrix[,j]/nrow,5)
+    xMy = x * y
+    xy = sqrt(alpha * xMy)
+
+
+    a = matrix[,i]
+    b = matrix[,j]
+    xx =   (round( a / b, 5) + a ) * 100000
+    #xx =    a * b  + a
+    #xx =   (round( sequences$matrix[,i] / sequences$matrix[,j],3) + sequences$matrix[,i]) * 1000
+    xx = biseqlevel[match(xx, biseqidlevel)]
+
+    #print(xx)
+
+    aa = table(xx)[xx]
+    aa = as.vector(round(aa/nrow,5)	)
+    bb = (which(aa>=xy))
+
+    #print(bb)
+
+    m2 =  Matrix::Matrix(0,nrow=nrow,ncol=1,sparse=TRUE)
+    if(length(bb)>=1){
+      #t = Sys.time()
+      #df_cooccurrence[bb,n] = 1
+
+      m2[bb,1]= 1
+
+
+      #print(length(bb))
+      #cooccur.printTimeCost('insert into df_cooccurrence',t,debug)
+    }
+
+    return(m2)
+
+}
 
 cooccur.gennetework.calucation <- function(rowx, alpha=0.9,sequences){
 	#print(rowx)
@@ -286,7 +387,7 @@ cooccur.gennetework.calucation <- function(rowx, alpha=0.9,sequences){
 		#print(sqrt(alpha*x*y))
 		corrrr = ((xy))^2/xMy
 	}
-	
+
 	#print(corrrr)
 	corrrry = ifelse(corrrr>=alpha, 1, 0)
 	cooccurrenceList= c(cooccurrenceList, corrrry)
@@ -470,7 +571,7 @@ cooccur.gennetework.outputNetWorkProperties <- function(rowid,sequences,df_coocc
 }
 
 #' @importFrom   foreach %do%
-cooccur.gennetework.outputNetWorkcooccurrence <- function(sequences,df_cooccurrence,shuffeld=FALSE){
+cooccur.gennetework.outputNetWorkcooccurrence <- function(sequences,df_cooccurrence,shuffeld=FALSE, debug){
 	#require(Matrix)
 	if(!requireNamespace("foreach", quietly = TRUE)){
 		stop("Package 'foreach' is required.")
@@ -495,7 +596,7 @@ cooccur.gennetework.outputNetWorkcooccurrence <- function(sequences,df_cooccurre
 		cooccurr = c()
 		#print(x)
 		len = length(which(x==1))
-		
+
 
 		if(shuffeld==FALSE){
 			sub_dfcooc <- subset(sequences$dt_idxtable, sequences$dt_idxtable[,1]==colid)
@@ -518,7 +619,7 @@ cooccur.gennetework.outputNetWorkcooccurrence <- function(sequences,df_cooccurre
 		cooccurrence = Matrix::rBind(cooccurrence,cooccurr)
 		#cooccurrence[colid,] = cooccurr
 	}
-	#cooccur.printTimeCost('calculate network cooccurrence time cost',t,debug)
+	cooccur.printTimeCost('cooccur.gennetework.outputNetWorkcooccurrence time cost',t,debug)
 	return(cooccurrence)
 }
 
