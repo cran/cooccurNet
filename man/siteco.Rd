@@ -4,27 +4,31 @@
 \alias{siteco}
 \title{siteco}
 \usage{
-siteco(dataFile = "", dataType = "DNA", conservativeFilter = 0.95,
+siteco(dataFile = "", dataType = "protein", conservativeFilter = 0.95,
   cooccurFilter = NULL, siteCoFile = "siteCooccurr", sampleTimes = 100,
-  debug = FALSE)
+  debug = FALSE, parallel = FALSE, memory = NULL)
 }
 \arguments{
-\item{dataFile}{file name with full path of DNA, protein, SNP data or other kinds of data}
+\item{dataFile}{character, a FASTA data file name with full path.}
 
-\item{dataType}{the type of data. It could be 'DNA' (default), 'protein', 'SNP' or 'other'}
+\item{dataType}{character, 'protein' by default, the type of data will be processed. It could be 'DNA', 'RNA', 'protein', 'SNP' or 'other'.}
 
-\item{conservativeFilter}{0.95 by default. a number in the range of 0~1. The column with conservative score greater than it would be filtered in the later analyses;}
+\item{conservativeFilter}{numeric, a number in the range of 0~1,  0.95 by default. It's used to filter the highly conservative columns which the ratio of some residue is larger than the conservationFilter.}
 
-\item{cooccurFilter}{a number in the range of 0~1. It determines whether two columns are perfect co-occurrence;}
+\item{cooccurFilter}{numeric, a number in the range of 0~1. It determines whether two columns are perfect co-occurrence. In default, for the data type of protein, it is set to be 0.9, while for the other data types, it is set to be 1.}
 
-\item{siteCoFile}{file name with full path  for storing the extent of co-occurrence between all pairs of columns, and the related p-values. The later are calculated by simulations as follows   firstly, all columns in the data are randomly permutated; then, the pairwise siteCos are calculated. This process would be repeated N times (the value depends on the parameter sampleTimes). For each pair of columns, the rank of the original siteCo in the N siteCos derived from simulations are considered as the p-value for the original siteCo.}
+\item{siteCoFile}{character, 'siteCooccurr' by default. It is a file name with full path for storing the RCOS between all pairs of columns, and the related p-values.}
 
-\item{sampleTimes}{a integer of permutations in the simulation when calculating the p-values.}
+\item{sampleTimes}{numeric, an integer of permutations in the simulation when calculating the p-values. It should be greater than 100.}
 
-\item{debug}{FALSE by default; to indicate whether the debug message will be displayed or not}
+\item{debug}{logic, FALSE by default, indicates whether the debug message will be displayed or not.}
+
+\item{parallel}{logic, FALSE by default. It only supports Unix/Mac (not Windows) system.}
+
+\item{memory}{character, the type of matrix, NULL by default. It could be 'memory' or 'sparse'. If it's set to be 'memory', all data would be manipulated in the RAM by using normal matrix and package 'bigmemory'. If it's set to be 'sparse', the package "Matrix" would be used to manipulate massive matrices in memory and initialize huge sparse matrix, which could significantly reduce the RAM consumed. In default, it is set to be NULL, so that the system would determine automatically whether all data is manipulated in the RAM or not, according to the size of data inputted and the RAM available for R.}
 }
 \value{
-a list and the output file path of 'sitecoFile' is attributed in it. The file stores all the pairwise siteCos between columns.
+list, the output file path of 'sitecoFile' is attributed in it. The file stores all the pairwise siteCos between columns.
 }
 \description{
 Read and preprocess data, and calculate the pairwise site co-occurrence in one step

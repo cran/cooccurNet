@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>Extending cooccurNet</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Extending cooccurNet</h1>
+
+
+
+<p>This vignette documents the official extension mechanism provided in cooccurNet 0.1.4. Most of this information is available scattered throughout the R documentation. This vignette brings it all together in one place.</p>
+<p>As you read this document, you’ll learn to what the cooccurNet is, how to run the methods, and how to interpret, plot and report outputs.</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><strong>cooccurNet</strong> is an R package including functionalities of construction and analysis of residue (amino acid, nucleotide, SNP and so on) co-occurrence network. Besides, a new method for measuring residues coevolution, defined as <strong>residue co-occurrence score (RCOS)</strong>, was proposed and implemented in it based on the co-occurrence network.</p>
+<p>The co-occurrence network method was originally developed to capture the nucleotide co-occurrence pattern over the entire genome of human influenza H3N2 viruses [1]. It could effectively capture the evolutionary antigenic features of H3N2 virus at the whole-genome level and accurately describe the complex evolutionary patterns between individual gene segments. Besides influenza viruses, the co-occurrence network method was also used to Zaire ebolavirus (EBOV). In this work [2], we found that the features of co-occurrence networks (edges and nodes) built over the EBOV genome could accurately reflect the case fatality rate (CFR) of EBOV, which provided a novel and rapid way of assessing the CFR of EBOV even at the very beginning of the outbreak once its genome sequence is available. This suggests the potential usage of the co-occurrence network method in modeling the evolution of genomes.</p>
+<p>As we know, the genomes contain all the genetic information of an organism, the evolution of which is very complex. Currently, there is a lack of computational models for capturing the complex evolutionary features over the entire genome. Coevolution is prevalent in biology and it is an important driving force in evolution. The co-occurrence network method could capture the coevolution linkage between residues within the genome. It is unique in that it could transform a genome into a residue co-occurrence network, the features of which, such as the nodes, edges, connectivity and so on, may reflect important features of organisms, such as the antigenicity [1] and CFR [2] in the examples mentioned above.</p>
+<p>Actually, the co-occurrence network method is a general method which could be used to capture the co-occurrence pattern within samples. Besides genomes, it could be directly used in gene, protein, proteome, and so on. Due to a lack of a user-friendly software, the method is rarely used in other data type except for genomes. Based on the package “cooccurNet”, we believe the method could be widely used in biology.</p>
+<p>The <strong>RCOS</strong> method was newly proposed in the package. It is a method for measuring the association between two discrete variables. It could be used to measure the extent of residue coevolution in protein/DNA/RNA/SNP. Residue coevolution reflects the functional and structural constraints within a protein or gene. It could help for protein structure or function prediction [3-6]. Many computational methods have been developed in measure residue coevolution. Our tests show that the RCOS method achieved a similar performance with a state-of-the-art method PSICOV on a benchmark dataset [7]. Therefore, we believe the <strong>RCOS</strong> method could become an important method in measure residue coevolution.</p>
+<p><strong>References:</strong></p>
+<p>[1] Du X, Wang Z, Wu A, et al. Networks of genomic co-occurrence capture characteristics of human influenza A (H3N2) evolution[J]. Genome research, 2008, 18(1): 178-187.</p>
+<p>[2] Deng L, Liu M, Hua S, et al. Network of co-mutations in Ebola virus genome predicts the disease lethality[J]. Cell research, 2015, 25(6): 753.</p>
+<p>[3] Lee B C, Park K, Kim D. Analysis of the residue–residue coevolution network and the functionally important residues in proteins[J]. Proteins: Structure, Function, and Bioinformatics, 2008, 72(3): 863-872.</p>
+<p>[4] Aurora R, Donlin M J, Cannon N A, et al. Genome-wide hepatitis C virus amino acid covariance networks can predict response to antiviral therapy in humans[J]. The Journal of clinical investigation, 2009, 119(1): 225-236.</p>
+<p>[5] Jones D T, Buchan D W A, Cozzetto D, et al. PSICOV: precise structural contact prediction using sparse inverse covariance estimation on large multiple sequence alignments[J]. Bioinformatics, 2012, 28(2): 184-190.</p>
+<p>[6] Wang S, Li W, Zhang R, et al. CoinFold: a web server for protein contact prediction and contact-assisted protein folding[J]. Nucleic acids research, 2016: gkw307.</p>
+<p>[7] Zou Y, Wu Z, et al. cooccurNet: an R package for co-occurrence network construction and analysis. Bioinformatics (In submission).</p>
+</div>
+<div id="preliminaries" class="section level2">
+<h2>Preliminaries</h2>
+<div id="osmemory" class="section level3">
+<h3>OS/Memory</h3>
+<ul>
+<li><strong>cooccurNet</strong> compiles and runs on a wide variety of UNIX platforms, Windows and MacOS.</li>
+<li>System memory should <strong>≥ 2Gb</strong>. See section “Optimization” for more details.</li>
+</ul>
+</div>
+<div id="how-to-get-help" class="section level3">
+<h3>How to get help</h3>
+<p>Most questions about cooccurNet will hopefully be answered by the documentation or references.</p>
+<ul>
+<li><p><strong>cooccurNet</strong> is updated frequently. Once you have installed cooccurNet, You can get help from the change-log.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">logs &lt;-<span class="st"> </span><span class="kw">changeLog</span>(<span class="dt">n=</span><span class="dv">20</span>)
+logs
+<span class="co">#&gt; [1] &quot;2016-12-16 Yuanqiang Zou  &lt;jerrytsou2001@gmail.com&gt;&quot;</span>
+<span class="co">#&gt; [2] &quot;&quot;                                                   </span>
+<span class="co">#&gt; [3] &quot;\tDocument synchronization and testoutputs.&quot;</span></code></pre></div></li>
+<li><p>If you’ve run into a problem which could not be addressed by the documentation, or if you’ve found a conflict between the documentation and software itself, then please write to us: Yuanqiang Zou <a href="mailto:jerrytsou2001@gmail.com">jerrytsou2001@gmail.com</a> or Yousong Peng <a href="mailto:pys2013@hnu.edu.cn">pys2013@hnu.edu.cn</a>.</p></li>
+</ul>
+</div>
+</div>
+<div id="quick-start" class="section level2">
+<h2>Quick Start</h2>
+<p>In this section, you’ll learn to how to run the methods by using the sample data.</p>
+<div id="get-sample-sequence-file" class="section level3">
+<h3>Get sample sequence file</h3>
+<p>The <strong>parameter</strong> <code>dataType</code> could be ‘DNA’, ‘protein’, ‘SNP’, ‘RNA’. It’s ‘protein’ by default.</p>
+<div id="get-protein-sample-data-file-name-with-full-path" class="section level4">
+<h4>Get protein sample data file name with full path</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFile=<span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
+dataFile
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/protein&quot;</span></code></pre></div>
+</div>
+<div id="get-dna-sample-data-file-name-with-full-path" class="section level4">
+<h4>Get DNA sample data file name with full path</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFile=<span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;DNA&quot;</span>)
+dataFile
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/DNA&quot;</span></code></pre></div>
+</div>
+<div id="get-snp-sample-data-file-name-with-full-path" class="section level4">
+<h4>Get SNP sample data file name with full path</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFile=<span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;SNP&quot;</span>)
+dataFile
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/SNP&quot;</span></code></pre></div>
+</div>
+<div id="get-rna-sample-data-file-name-with-full-path" class="section level4">
+<h4>Get RNA sample data file name with full path</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFile=<span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;RNA&quot;</span>)
+dataFile
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/RNA&quot;</span></code></pre></div>
+</div>
+<div id="get-sample-rcos-protein-sequence-file-names-sample-human-h3n2-ha-protein-sequence-file-names-with-full-path" class="section level4">
+<h4>Get sample RCOS protein sequence file names (sample human H3N2 HA protein sequence file names with full path)</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFiles=<span class="kw">getexample_forRCOS</span>()
+dataFiles
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/RCOS/HA1protein_humanH3N2&quot;</span></code></pre></div>
+</div>
+</div>
+<div id="read-fasta-format-sequence-file" class="section level3">
+<h3>Read FASTA format sequence file</h3>
+<p>To save the RAM usage by the package, we have designed the method of using prime number to stand for the nucleotides or amino acid in the data inputted. As is known to us, in the R environment an integer vector uses 4 bytes per number, while a character vector uses 8 bytes per character. Using prime number to stand for character could save half of RAM usage for storing the data inputted. Besides, when calculating the frequency of a pair of characters (nucleotide or amino acid), it is necessary to concatenate the characters in R. After replacing the characters with prime numbers, for a pair of prime numbers A and B, we found that unique number could be derived using the following formula for prime numbers (starting from 2):</p>
+<pre><code>           (round(A/B,5)+B)*100000                    (1)
+           </code></pre>
+<p>The resulting values have a one-to-one correspondence with the pairs of nucleotide or amino acid. Therefore, the concentration of character vectors could be transformed to algebraic operation of prime number vectors, which could significantly reduce the time consumed in this process.</p>
+<p>The <strong>parameter</strong> <code>dataFile</code> is a FASTA data file name with full path.</p>
+<div id="read-protein-sample-data" class="section level4">
+<h4>Read protein sample data</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
+<span class="co">#&gt; Reading file......completed. (10,329)</span>
+data$original[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
+<span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span>
+<span class="co">#&gt;  [1,] &quot;Q&quot;  &quot;K&quot;  &quot;I&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt;  [2,] &quot;Q&quot;  &quot;K&quot;  &quot;L&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt;  [3,] &quot;Q&quot;  &quot;K&quot;  &quot;I&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt;  [4,] &quot;Q&quot;  &quot;K&quot;  &quot;I&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt;  [5,] &quot;Q&quot;  &quot;K&quot;  &quot;L&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt;  [6,] &quot;Q&quot;  &quot;K&quot;  &quot;V&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt;  [7,] &quot;Q&quot;  &quot;K&quot;  &quot;L&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt;  [8,] &quot;Q&quot;  &quot;K&quot;  &quot;I&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt;  [9,] &quot;Q&quot;  &quot;K&quot;  &quot;L&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
+<span class="co">#&gt; [10,] &quot;Q&quot;  &quot;K&quot;  &quot;L&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;</span>
+data$matrix[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
+<span class="co">#&gt;        1  2  3  4  5  6 7  8  9 10</span>
+<span class="co">#&gt;  [1,] 43 23 19 41 13 37 5 37 53 59</span>
+<span class="co">#&gt;  [2,] 43 23 29 41 13 37 5 37 53 59</span>
+<span class="co">#&gt;  [3,] 43 23 19 41 13 37 5 37 53 59</span>
+<span class="co">#&gt;  [4,] 43 23 19 41 13 37 5 37 53 59</span>
+<span class="co">#&gt;  [5,] 43 23 29 41 13 37 5 37 53 59</span>
+<span class="co">#&gt;  [6,] 43 23 61 41 13 37 5 37 53 59</span>
+<span class="co">#&gt;  [7,] 43 23 29 41 13 37 5 37 53 59</span>
+<span class="co">#&gt;  [8,] 43 23 19 41 13 37 5 37 53 59</span>
+<span class="co">#&gt;  [9,] 43 23 29 41 13 37 5 37 53 59</span>
+<span class="co">#&gt; [10,] 43 23 29 41 13 37 5 37 53 59</span></code></pre></div>
+</div>
+<div id="read-dna-sample-data" class="section level4">
+<h4>Read DNA sample data</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;DNA&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;DNA&quot;</span>)
+<span class="co">#&gt; Reading file......completed. (213,987)</span>
+data$original[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
+<span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span>
+<span class="co">#&gt;  [1,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [2,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [3,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [4,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [5,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [6,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [7,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [8,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [9,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt; [10,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;</span>
+data$matrix[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
+<span class="co">#&gt;       1 2 3 4 5 6 7 8 9 10</span>
+<span class="co">#&gt;  [1,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [2,] 3 2 2 2 2 3 3 7 7  3</span>
+<span class="co">#&gt;  [3,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [4,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [5,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [6,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [7,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [8,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [9,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt; [10,] 3 2 2 2 2 2 3 7 7  3</span></code></pre></div>
+</div>
+<div id="read-snp-sample-data" class="section level4">
+<h4>Read SNP sample data</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;SNP&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;SNP&quot;</span>)
+<span class="co">#&gt; Reading file......completed. (100,50)</span>
+data$original[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
+<span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span>
+<span class="co">#&gt;  [1,] &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  </span>
+<span class="co">#&gt;  [2,] &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  </span>
+<span class="co">#&gt;  [3,] &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  </span>
+<span class="co">#&gt;  [4,] &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  </span>
+<span class="co">#&gt;  [5,] &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  </span>
+<span class="co">#&gt;  [6,] &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  </span>
+<span class="co">#&gt;  [7,] &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  </span>
+<span class="co">#&gt;  [8,] &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  </span>
+<span class="co">#&gt;  [9,] &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  </span>
+<span class="co">#&gt; [10,] &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;</span>
+data$matrix[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
+<span class="co">#&gt;       1 2 3 4 5 6 7 8 9 10</span>
+<span class="co">#&gt;  [1,] 3 2 3 3 2 3 2 2 2  2</span>
+<span class="co">#&gt;  [2,] 2 3 2 2 3 3 2 3 3  2</span>
+<span class="co">#&gt;  [3,] 3 2 3 3 3 2 2 2 3  2</span>
+<span class="co">#&gt;  [4,] 3 3 2 2 3 3 2 3 2  3</span>
+<span class="co">#&gt;  [5,] 2 2 2 3 2 3 2 2 3  2</span>
+<span class="co">#&gt;  [6,] 2 2 3 3 3 3 2 2 2  2</span>
+<span class="co">#&gt;  [7,] 2 3 2 2 2 2 2 2 2  3</span>
+<span class="co">#&gt;  [8,] 3 2 2 2 2 2 2 2 3  2</span>
+<span class="co">#&gt;  [9,] 3 3 2 3 2 3 3 2 3  2</span>
+<span class="co">#&gt; [10,] 2 3 3 2 3 2 2 3 2  3</span></code></pre></div>
+</div>
+<div id="read-rna-sample-data" class="section level4">
+<h4>Read RNA sample data</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;RNA&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;RNA&quot;</span>)
+<span class="co">#&gt; Reading file......completed. (45,987)</span>
+data$original[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
+<span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span>
+<span class="co">#&gt;  [1,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [2,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [3,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [4,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [5,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [6,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [7,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [8,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt;  [9,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
+<span class="co">#&gt; [10,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;</span>
+data$matrix[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
+<span class="co">#&gt;       1 2 3 4 5 6 7 8 9 10</span>
+<span class="co">#&gt;  [1,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [2,] 3 2 2 2 2 3 3 7 7  3</span>
+<span class="co">#&gt;  [3,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [4,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [5,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [6,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [7,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [8,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt;  [9,] 3 2 2 2 2 2 3 7 7  3</span>
+<span class="co">#&gt; [10,] 3 2 2 2 2 2 3 7 7  3</span></code></pre></div>
+</div>
+</div>
+<div id="pre-process-the-data-inputted" class="section level3">
+<h3>Pre-process the data inputted</h3>
+<p>The <strong>parameter</strong> <code>conservativeFilter</code> is used to filter the highly conservative columns which the ratio of some residue is larger than the conservationFilter. By default, it is set to be 0.95.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
+<span class="co">#&gt; Reading file......completed. (10,329)</span>
+data_process =<span class="st"> </span><span class="kw">pprocess</span>(<span class="dt">data=</span>data,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>)
+<span class="co">#&gt; Pre-processing......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Pre-process......completed. (10,42)</span></code></pre></div>
+</div>
+<div id="generate-co-occurrence-network-and-save-it-into-networkfile" class="section level3">
+<h3>Generate co-occurrence network and save it into ‘networkFile’</h3>
+<p>For each sequence, a residue co-occurrence network would be generated. It measures the covariations between residues in the sequence. The features and properties of the network may capture important features of species, such as the antigenicity and CFR mentioned above in the section of introduction.</p>
+<p>The <strong>parameter</strong> <code>cooccurFilter</code> is used to determine whether a pair of residues have perfect co-occurrence. By default, it is set to be 0.90 for the data type of protein, while it is set to be 1 for the data type of DNA, RNA, SNP and so on.</p>
+<p>The <strong>parameter</strong> <code>networkFile</code> is a file name with full path for storing the co-occurrence network for each row. In default, it is set to be ‘cooccurNetwork’, which is in your current workspace (<code>getwd()</code>)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork =<span class="st"> </span><span class="kw">gencooccur</span>(<span class="dt">data=</span>data_process, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">networkFile=</span><span class="st">'cooccurNetwork'</span>)
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span>
+workspace =<span class="st"> </span><span class="kw">getwd</span>()
+workspace
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rbuild378824b746dc/cooccurNet/vignettes&quot;</span>
+<span class="kw">readLines</span>(cooccurNetwork$networkFile)
+<span class="co">#&gt;  [1] &quot;EPI823725 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                </span>
+<span class="co">#&gt;  [2] &quot;EPI775768 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261 267-312&quot;                                                                                  </span>
+<span class="co">#&gt;  [3] &quot;EPI814365 3-144 3-159 3-311 25-121 25-216 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 142-197 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                          </span>
+<span class="co">#&gt;  [4] &quot;EPI787403 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 142-197 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                        </span>
+<span class="co">#&gt;  [5] &quot;EPI787049 25-208 25-238 25-261 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                     </span>
+<span class="co">#&gt;  [6] &quot;EPI775712 3-140 3-158 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-225 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                              </span>
+<span class="co">#&gt;  [7] &quot;EPI777683 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 159-225 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                                                  </span>
+<span class="co">#&gt;  [8] &quot;EPI787395 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                </span>
+<span class="co">#&gt;  [9] &quot;EPI731085 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                                          </span>
+<span class="co">#&gt; [10] &quot;EPI748184 43-45 43-48 43-144 43-186 43-219 43-267 43-278 45-48 45-144 45-186 45-219 45-267 45-278 48-144 48-186 48-219 48-267 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-186 144-219 144-267 144-278 159-225 186-219 186-267 186-278 208-238 208-261 219-267 219-278 238-261 267-278&quot;</span></code></pre></div>
+</div>
+<div id="generate-co-occurrence-network-file-by-one-command" class="section level3">
+<h3>Generate co-occurrence network file by one command</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">networkFile=</span><span class="st">'cooccurNetwork'</span>)
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span>
+<span class="kw">readLines</span>(cooccurNetwork$networkFile)
+<span class="co">#&gt;  [1] &quot;EPI823725 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                </span>
+<span class="co">#&gt;  [2] &quot;EPI775768 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261 267-312&quot;                                                                                  </span>
+<span class="co">#&gt;  [3] &quot;EPI814365 3-144 3-159 3-311 25-121 25-216 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 142-197 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                          </span>
+<span class="co">#&gt;  [4] &quot;EPI787403 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 142-197 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                        </span>
+<span class="co">#&gt;  [5] &quot;EPI787049 25-208 25-238 25-261 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                     </span>
+<span class="co">#&gt;  [6] &quot;EPI775712 3-140 3-158 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-225 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                              </span>
+<span class="co">#&gt;  [7] &quot;EPI777683 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 159-225 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                                                  </span>
+<span class="co">#&gt;  [8] &quot;EPI787395 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                </span>
+<span class="co">#&gt;  [9] &quot;EPI731085 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                                          </span>
+<span class="co">#&gt; [10] &quot;EPI748184 43-45 43-48 43-144 43-186 43-219 43-267 43-278 45-48 45-144 45-186 45-219 45-267 45-278 48-144 48-186 48-219 48-267 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-186 144-219 144-267 144-278 159-225 186-219 186-267 186-278 208-238 208-261 219-267 219-278 238-261 267-278&quot;</span></code></pre></div>
+</div>
+<div id="generate-co-occurrence-network-module-file-by-one-command" class="section level3">
+<h3>Generate co-occurrence network module file by one command</h3>
+<p>This would calculate all the modules (sub-graphs) included in each residue co-occurrence network.</p>
+<p>The <strong>parameter</strong> <code>module</code> is a boolean flag to check whether the modules in each network of the networkFile would be calculated.</p>
+<p>The <strong>parameter</strong> <code>moduleFile</code> is a file name with full path for storing the modules for co-occurrence network. It’s ‘cooccurNetworkModule’ by default.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork  =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">module =</span> <span class="ot">TRUE</span>, <span class="dt">moduleFile=</span><span class="st">'cooccurNetworkModule'</span>)
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 3. creating module file (cooccurNetworkModule) ......completed</span>
+<span class="co">#&gt; </span>
+<span class="kw">readLines</span>(cooccurNetwork$moduleFile)
+<span class="co">#&gt;  [1] &quot;EPI823725 (3,144,159,311) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (208,238,261)&quot;              </span>
+<span class="co">#&gt;  [2] &quot;EPI775768 (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (128,142) (140,158) (159,326) (208,238,261) (267,312)&quot;</span>
+<span class="co">#&gt;  [3] &quot;EPI814365 (3,144,159,311) (25,121,216) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (140,158) (142,197) (208,238,261)&quot; </span>
+<span class="co">#&gt;  [4] &quot;EPI787403 (3,144,159,311) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (142,197) (208,238,261)&quot;    </span>
+<span class="co">#&gt;  [5] &quot;EPI787049 (25,208,238,261) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (128,142) (140,158) (159,326)&quot;       </span>
+<span class="co">#&gt;  [6] &quot;EPI775712 (3,140,158) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (128,142) (159,225) (208,238,261)&quot;        </span>
+<span class="co">#&gt;  [7] &quot;EPI777683 (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (159,225) (208,238,261)&quot;                    </span>
+<span class="co">#&gt;  [8] &quot;EPI787395 (3,144,159,311) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (208,238,261)&quot;              </span>
+<span class="co">#&gt;  [9] &quot;EPI731085 (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (128,142) (140,158) (159,326) (208,238,261)&quot;          </span>
+<span class="co">#&gt; [10] &quot;EPI748184 (43,45,48,144,186,219,267,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (159,225) (208,238,261)&quot;</span></code></pre></div>
+</div>
+<div id="generate-co-occurrence-network-property-file-by-one-command" class="section level3">
+<h3>Generate co-occurrence network property file by one command</h3>
+<p>The <strong>parameter</strong> <code>property</code> is a boolean flag to check whether the properties for each network of the networkFile, including the network diameter, connectivity, ConnectionEffcient and so on, would be calculated.</p>
+<p>The <strong>parameter</strong> <code>propertyFile</code> is file name with full path storing the properties for each network of the networkFile. It’s ‘cooccurNetworkProperty’ by default.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork  =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">property =</span> <span class="ot">TRUE</span>, <span class="dt">propertyFile=</span><span class="st">'cooccurNetworkProperty'</span>)
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 3. creating property file (cooccurNetworkProperty) ......completed</span>
+<span class="co">#&gt; </span>
+<span class="kw">readLines</span>(cooccurNetwork$propertyFile)[<span class="dv">1</span>:<span class="dv">5</span>]
+<span class="co">#&gt; [1] &quot;name  Connectivity  Diameter  Radius  ConnectionEffcient&quot;</span>
+<span class="co">#&gt; [2] &quot;EPI823725 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt; [3] &quot;EPI775768 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt; [4] &quot;EPI814365 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt; [5] &quot;EPI787403 0 1 1 1&quot;</span></code></pre></div>
+</div>
+<div id="generate-the-residue-co-occurence-file-by-one-command" class="section level3">
+<h3>Generate the residue co-occurence file by one command</h3>
+<p>This is to calculate the pairwise residue co-occurrence score (RCOS) for all pairs of positions within the sequences. To evaluate the statistical significance of RCOS, the data would be permutated N times (N=100 in default). This process would take a long time. The RCOS was calculated in the permutated data and sorted decreasingly. The rank of the RCOS derived from the original data in the RCOSs derived from the permutated data divided by N was considered as the p-value for the ROCS.</p>
+<p>The <strong>parameter</strong> <code>siteCoFile</code> is file name with full path for storing the RCOS between all pairs of columns, and the related p-values. It’s ‘siteCooccurr’ by default.</p>
+<p>The <strong>parameter</strong> <code>sampleTimes</code> is an integer of permutations in the simulation when calculating the p-values. It should be greater than 100.</p>
+<p><strong>In the example listed below, we assign 10 to the parameter <code>sampleTimes</code> only for testing purpose. Normally, It should be greater than 100.</strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pairwiseCooccur =<span class="st"> </span><span class="kw">siteco</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>, <span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">siteCoFile=</span><span class="st">'siteCooccurr'</span>, <span class="dt">sampleTimes=</span><span class="dv">10</span>)
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; calculating cooccurrence..........</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating siteCoFile (siteCooccurr), sampleTimes: 10 ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (1) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (2) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (3) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (4) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (5) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (6) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (7) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (8) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (9) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (10) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed</span>
+<span class="kw">readLines</span>(pairwiseCooccur$siteCoFile)[<span class="dv">1</span>:<span class="dv">5</span>]
+<span class="co">#&gt; [1] &quot;Site_i Site_j Co-occur p-value&quot; &quot;3 25 0 1&quot;                      </span>
+<span class="co">#&gt; [3] &quot;3 33 0 1&quot;                       &quot;3 43 0 1&quot;                      </span>
+<span class="co">#&gt; [5] &quot;3 45 0 1&quot;</span></code></pre></div>
+</div>
+<div id="generate-the-co-occurrence-network-network-module-network-property-and-rcos-file-by-one-command" class="section level3">
+<h3>Generate the co-occurrence network, network module, network property and RCOS file by one command</h3>
+<p>The <strong>parameter</strong> <code>siteCo</code> is a boolean flag to check whether the residue co-occurence file would be calculated.</p>
+<p><strong>In the example listed below, we assign 10 to the parameter <code>sampleTimes</code> only for testing purpose. Normally, It should be greater than 100.</strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork  =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">networkFile=</span><span class="st">'cooccurNetwork'</span>, <span class="dt">module =</span> <span class="ot">TRUE</span>, <span class="dt">moduleFile=</span><span class="st">'cooccurNetworkModule'</span>, <span class="dt">property =</span> <span class="ot">TRUE</span>, <span class="dt">propertyFile=</span><span class="st">'cooccurNetworkProperty'</span>, <span class="dt">siteCo=</span><span class="ot">TRUE</span>, <span class="dt">siteCoFile=</span><span class="st">'siteCooccurr'</span>, <span class="dt">sampleTimes=</span><span class="dv">10</span> )
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 3. creating module file (cooccurNetworkModule) ......completed</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 4. creating property file (cooccurNetworkProperty) ......completed</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; calculating cooccurrence..........</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 5. creating siteCoFile (siteCooccurr), sampleTimes: 10 ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (1) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (2) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (3) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (4) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (5) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (6) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (7) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (8) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (9) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     calculating shuffled network (10) ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed</span>
+<span class="kw">readLines</span>(cooccurNetwork$networkFile)
+<span class="co">#&gt;  [1] &quot;EPI823725 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                </span>
+<span class="co">#&gt;  [2] &quot;EPI775768 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261 267-312&quot;                                                                                  </span>
+<span class="co">#&gt;  [3] &quot;EPI814365 3-144 3-159 3-311 25-121 25-216 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 142-197 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                          </span>
+<span class="co">#&gt;  [4] &quot;EPI787403 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 142-197 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                        </span>
+<span class="co">#&gt;  [5] &quot;EPI787049 25-208 25-238 25-261 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                     </span>
+<span class="co">#&gt;  [6] &quot;EPI775712 3-140 3-158 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-225 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                              </span>
+<span class="co">#&gt;  [7] &quot;EPI777683 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 159-225 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                                                  </span>
+<span class="co">#&gt;  [8] &quot;EPI787395 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                </span>
+<span class="co">#&gt;  [9] &quot;EPI731085 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                                          </span>
+<span class="co">#&gt; [10] &quot;EPI748184 43-45 43-48 43-144 43-186 43-219 43-267 43-278 45-48 45-144 45-186 45-219 45-267 45-278 48-144 48-186 48-219 48-267 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-186 144-219 144-267 144-278 159-225 186-219 186-267 186-278 208-238 208-261 219-267 219-278 238-261 267-278&quot;</span>
+<span class="kw">readLines</span>(cooccurNetwork$moduleFile)
+<span class="co">#&gt;  [1] &quot;EPI823725 (3,144,159,311) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (208,238,261)&quot;              </span>
+<span class="co">#&gt;  [2] &quot;EPI775768 (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (128,142) (140,158) (159,326) (208,238,261) (267,312)&quot;</span>
+<span class="co">#&gt;  [3] &quot;EPI814365 (3,144,159,311) (25,121,216) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (140,158) (142,197) (208,238,261)&quot; </span>
+<span class="co">#&gt;  [4] &quot;EPI787403 (3,144,159,311) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (142,197) (208,238,261)&quot;    </span>
+<span class="co">#&gt;  [5] &quot;EPI787049 (25,208,238,261) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (128,142) (140,158) (159,326)&quot;       </span>
+<span class="co">#&gt;  [6] &quot;EPI775712 (3,140,158) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (128,142) (159,225) (208,238,261)&quot;        </span>
+<span class="co">#&gt;  [7] &quot;EPI777683 (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (159,225) (208,238,261)&quot;                    </span>
+<span class="co">#&gt;  [8] &quot;EPI787395 (3,144,159,311) (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (208,238,261)&quot;              </span>
+<span class="co">#&gt;  [9] &quot;EPI731085 (43,45,48,186,219,278) (53,114,203) (62,259) (92,194) (121,216) (128,142) (140,158) (159,326) (208,238,261)&quot;          </span>
+<span class="co">#&gt; [10] &quot;EPI748184 (43,45,48,144,186,219,267,278) (53,114,203) (62,259) (92,194) (121,216) (140,158) (159,225) (208,238,261)&quot;</span>
+<span class="kw">readLines</span>(cooccurNetwork$propertyFile)
+<span class="co">#&gt;  [1] &quot;name  Connectivity  Diameter  Radius  ConnectionEffcient&quot;</span>
+<span class="co">#&gt;  [2] &quot;EPI823725 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt;  [3] &quot;EPI775768 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt;  [4] &quot;EPI814365 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt;  [5] &quot;EPI787403 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt;  [6] &quot;EPI787049 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt;  [7] &quot;EPI775712 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt;  [8] &quot;EPI777683 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt;  [9] &quot;EPI787395 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt; [10] &quot;EPI731085 0 1 1 1&quot;                                       </span>
+<span class="co">#&gt; [11] &quot;EPI748184 0 1 1 1&quot;</span>
+<span class="kw">readLines</span>(cooccurNetwork$siteCoFile)[<span class="dv">1</span>:<span class="dv">5</span>]
+<span class="co">#&gt; [1] &quot;Site_i Site_j Co-occur p-value&quot; &quot;3 25 0 1&quot;                      </span>
+<span class="co">#&gt; [3] &quot;3 33 0 1&quot;                       &quot;3 43 0 1&quot;                      </span>
+<span class="co">#&gt; [5] &quot;3 45 0 1&quot;</span></code></pre></div>
+</div>
+<div id="read-and-plot-network-file" class="section level3">
+<h3>Read and Plot network file</h3>
+<div id="read-and-plot-a-specified-network-the-package-igraph-must-be-installed-and-loaded-firstly" class="section level4">
+<h4>Read and Plot a specified network (The package “igraph” must be installed and loaded firstly)</h4>
+<p>The <strong>parameter</strong> <code>networkFile</code> is file name with full path for storing the co-occurrence network for each row.</p>
+<p>The <strong>parameter</strong> <code>networkName</code> is a vector of network names.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>),<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span>
+network_igraph =<span class="st"> </span><span class="kw">toigraph</span>(<span class="dt">networkFile=</span>cooccurNetwork$networkFile, <span class="dt">networkName=</span><span class="kw">c</span>(<span class="st">&quot;EPI823725&quot;</span>))
+<span class="kw">plot</span>(network_igraph[[<span class="dv">1</span>]])</code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="read-all-networks-and-plot-one" class="section level4">
+<h4>Read all networks and plot one</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>),<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span>
+network_igraph =<span class="st"> </span><span class="kw">toigraph</span>(<span class="dt">networkFile=</span>cooccurNetwork$networkFile, <span class="dt">networkName=</span>cooccurNetwork$xnames)
+<span class="kw">plot</span>(network_igraph[[<span class="dv">2</span>]])  </code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="save-graphics-as-pdf-or-jpeg" class="section level4">
+<h4>Save graphics as PDF or jpeg</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">workspace =<span class="st"> </span><span class="kw">getwd</span>()
+cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>),<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating bigram frequency ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span>
+network_igraph =<span class="st"> </span><span class="kw">toigraph</span>(<span class="dt">networkFile=</span>cooccurNetwork$networkFile, <span class="dt">networkName=</span>cooccurNetwork$xnames)
+<span class="co">#save as PDF</span>
+<span class="kw">pdf</span>(<span class="dt">file=</span><span class="st">&quot;sample1.pdf&quot;</span>)
+<span class="kw">plot</span>(network_igraph[[<span class="dv">1</span>]])  
+<span class="kw">dev.off</span>()
+<span class="co">#&gt; png </span>
+<span class="co">#&gt;   2</span>
+<span class="co">#save as jpeg</span>
+<span class="kw">jpeg</span>(<span class="dt">file=</span><span class="st">&quot;sample1.jpeg&quot;</span>)
+<span class="kw">plot</span>(network_igraph[[<span class="dv">2</span>]])  
+<span class="kw">dev.off</span>()
+<span class="co">#&gt; png </span>
+<span class="co">#&gt;   2</span>
+workspace
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rbuild378824b746dc/cooccurNet/vignettes&quot;</span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="outputs" class="section level2">
+<h2>Outputs</h2>
+<p>The outputs for the package <strong>cooccurNet</strong> are listed as follows:</p>
+<ol style="list-style-type: decimal">
+<li><p>A <strong>co-occurrence network</strong> (<code>networkFile</code>) was given for each sequence, which could be easily transformed into the format of igraph by the function toigraph();</p></li>
+<li><p>The <strong>inherent modules</strong>(<code>moduleFile</code>) in each co-occurrence network and <strong>some basic network attributes</strong>(<code>propertyFile</code>) such as <code>connectivity</code> and <code>clustering coefficient</code> for each network were given;</p></li>
+<li><p>The <strong>extent of co-occurrence between residues</strong>(<code>siteCoFile</code>), defined as residue co-occurrence score (RCOS), were given for all pairs of residues.</p></li>
+</ol>
+</div>
+<div id="optimization" class="section level2">
+<h2>Optimization</h2>
+<p>During the development of <strong>cooccurNet</strong>, we found that <strong>cooccurNet</strong> consumed lots of RAM, which may lead to crash of computer when the data inputted is large. In order to solve this RAM shortage problem, several approaches were taken into account.</p>
+<div id="matrix-type" class="section level3">
+<h3>Matrix type</h3>
+<p>The <strong>parameter</strong> <code>memory</code> indicates the type of matrix used in <strong>cooccurNet</strong>. It could be ‘memory’ or ‘sparse’. If it’s set to be ‘memory’, all data would be manipulated in the RAM by using normal matrix and package ‘bigmemory’. If it’s set to be ‘sparse’, the package “Matrix” would be used to manipulate massive matrices in memory and initialize huge sparse matrix, which could significantly reduce the RAM consumed. In default, it is set to be NULL, so that <strong>cooccurNet</strong> would determine automatically whether all data is manipulated in the RAM or not, according to the size of data inputted and the RAM available for R.</p>
+<p><strong>If your system has not enough RAM, you can set <code>memory='sparse'</code> to keep this program working properly.</strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork  =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">networkFile=</span><span class="st">'cooccurNetwork'</span>, <span class="dt">memory=</span><span class="st">'sparse'</span>)
+<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; preprocess file......preprocess file......completed. (10,42)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 1. calculating networks ......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
+<span class="co">#&gt; </span></code></pre></div>
+<div id="ram-usage-optimization-for-cooccurnet" class="section level4">
+<h4>RAM usage optimization for <strong>cooccurNet</strong></h4>
+<table style="width:169%;">
+<colgroup>
+<col width="38%"></col>
+<col width="33%"></col>
+<col width="54%"></col>
+<col width="43%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Dimension of data inputted</th>
+<th align="left">Size of data inputted</th>
+<th align="left">RAM requirement without optimization</th>
+<th align="left">RAM usage after optimization</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">10 x 10</td>
+<td align="left">400 b</td>
+<td align="left">1.8 Kb</td>
+<td align="left">1.6 Kb</td>
+</tr>
+<tr class="even">
+<td align="left">100 x 100</td>
+<td align="left">39 Kb</td>
+<td align="left">1933 Kb</td>
+<td align="left">20.7 Kb</td>
+</tr>
+<tr class="odd">
+<td align="left">1000x 1000</td>
+<td align="left">3.8 Mb</td>
+<td align="left">1905 Mb</td>
+<td align="left">1.9 Mb</td>
+</tr>
+<tr class="even">
+<td align="left">10000x 10000</td>
+<td align="left">381.5 Mb</td>
+<td align="left">1862 Gb</td>
+<td align="left">190.7 Mb</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="high-performance-computation" class="section level3">
+<h3>High performance computation</h3>
+<p>The <strong>parameter</strong> <code>parallel</code> is a boolean flag to indicate whether the parallel function is in use or not.</p>
+<p>In the current version of <strong>cooccurNet</strong> (0.1.4) , the package <code>parallel</code> from R core is in use. For better memory handling purpose, we use <code>FORK</code>, but it only supports <strong>Unix/Mac (not Windows)</strong> system.</p>
+<p><strong>Only if the parameter <code>memory = 'sparse'</code>, ‘parallel’ would take effect.</strong></p>
+<p>Parallel uses <code>max(1, detectCores()-1)</code> cores. If you want to specify yours, plesae create a text file named <code>cores</code> in your workspace and put a number in it.</p>
+<p><code>cooccurNetwork  = coocnet(dataFile=getexample(dataType=&quot;protein&quot;), dataType=&quot;protein&quot;,conservativeFilter=0.95, cooccurFilter=0.9, networkFile='cooccurNetwork', memory='sparse', parallel=TRUE)</code></p>
+</div>
+<div id="debug-your-calculation" class="section level3">
+<h3>Debug your calculation</h3>
+<p>The <strong>parameter</strong> <code>debug</code> is a boolean flag to indicate whether the debug message will be displayed or not, it’s FALSE by default. You can add it into each function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">debug=</span><span class="ot">TRUE</span>)
+<span class="co">#&gt; Reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     reading sequence from file time cost:0.16 secs;memory applied:93.9 MB</span>
+<span class="co">#&gt; character level:A,C,D,E,F,G,H,I,K,L,M,N,P,Q,R,S,T,V,W,X,Y</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     split string to character time cost:0.69 secs;memory applied:94.1 MB</span>
+<span class="co">#&gt; completed. (10,329)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     total co-occurrence.readsequence time cost:0.97 secs;memory applied:94.1 MB</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

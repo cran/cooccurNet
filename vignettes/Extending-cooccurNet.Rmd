@@ -1,0 +1,354 @@
+---
+title: "Extending cooccurNet"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extending cooccurNet}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 5, fig.height = 5, fig.align = "center")
+library(cooccurNet)
+```
+
+This vignette documents the official extension mechanism provided in cooccurNet 0.1.4.  Most of this information is available scattered throughout the R documentation.  This vignette brings it all together in one place. 
+
+As you read this document, you'll learn to what the cooccurNet is, how to run the methods, and how to interpret, plot and report outputs.
+
+## Introduction
+
+__cooccurNet__ is an R package including functionalities of construction and analysis of residue (amino acid, nucleotide, SNP and so on) co-occurrence network. Besides, a new method for measuring residues coevolution, defined as __residue co-occurrence score (RCOS)__, was proposed and implemented in it based on the co-occurrence network. 
+
+The co-occurrence network method was originally developed to capture the nucleotide co-occurrence pattern over the entire genome of human influenza H3N2 viruses [1]. It could effectively capture the evolutionary antigenic features of H3N2 virus at the whole-genome level and accurately describe the complex evolutionary patterns between individual gene segments. Besides influenza viruses, the co-occurrence network method was also used to Zaire ebolavirus (EBOV). In this work [2], we found that the features of co-occurrence networks (edges and nodes) built over the EBOV genome could accurately reflect the case fatality rate (CFR) of EBOV, which provided a novel and rapid way of assessing the CFR of EBOV even at the very beginning of the outbreak once its genome sequence is available. This suggests the potential usage of the co-occurrence network method in modeling the evolution of genomes.
+
+As we know, the genomes contain all the genetic information of an organism, the evolution of which is very complex. Currently, there is a lack of computational models for capturing the complex evolutionary features over the entire genome. Coevolution is prevalent in biology and it is an important driving force in evolution. The co-occurrence network method could capture the coevolution linkage between residues within the genome. It is unique in that it could transform a genome into a residue co-occurrence network, the features of which, such as the nodes, edges, connectivity and so on, may reflect important features of organisms, such as the antigenicity [1] and CFR [2] in the examples mentioned above.
+
+Actually, the co-occurrence network method is a general method which could be used to capture the co-occurrence pattern within samples. Besides genomes, it could be directly used in gene, protein, proteome, and so on. Due to a lack of a user-friendly software, the method is rarely used in other data type except for genomes. Based on the package “cooccurNet”, we believe the method could be widely used in biology.
+
+The __RCOS__ method was newly proposed in the package. It is a method for measuring the association between two discrete variables. It could be used to measure the extent of residue coevolution in protein/DNA/RNA/SNP. Residue coevolution reflects the functional and structural constraints within a protein or gene. It could help for protein structure or function prediction [3-6]. Many computational methods have been developed in measure residue coevolution. Our tests show that the RCOS method achieved a similar performance with a state-of-the-art method PSICOV on a benchmark dataset [7]. Therefore, we believe the __RCOS__ method could become an important method in measure residue coevolution.
+
+__References:__
+
+[1] Du X, Wang Z, Wu A, et al. Networks of genomic co-occurrence capture characteristics of human influenza A (H3N2) evolution[J]. Genome research, 2008, 18(1): 178-187.
+
+[2] Deng L, Liu M, Hua S, et al. Network of co-mutations in Ebola virus genome predicts the disease lethality[J]. Cell research, 2015, 25(6): 753.
+
+[3] Lee B C, Park K, Kim D. Analysis of the residue–residue coevolution network and the functionally important residues in proteins[J]. Proteins: Structure, Function, and Bioinformatics, 2008, 72(3): 863-872.
+
+[4] Aurora R, Donlin M J, Cannon N A, et al. Genome-wide hepatitis C virus amino acid covariance networks can predict response to antiviral therapy in humans[J]. The Journal of clinical investigation, 2009, 119(1): 225-236.
+
+[5] Jones D T, Buchan D W A, Cozzetto D, et al. PSICOV: precise structural contact prediction using sparse inverse covariance estimation on large multiple sequence alignments[J]. Bioinformatics, 2012, 28(2): 184-190.
+
+[6] Wang S, Li W, Zhang R, et al. CoinFold: a web server for protein contact prediction and contact-assisted protein folding[J]. Nucleic acids research, 2016: gkw307.
+
+[7] Zou Y, Wu Z, et al. cooccurNet: an R package for co-occurrence network construction and analysis. Bioinformatics (In submission).
+
+
+
+## Preliminaries
+
+### OS/Memory
+*    __cooccurNet__ compiles and runs on a wide variety of UNIX platforms, Windows and MacOS.
+*   System memory should __≥ 2Gb__. See section "Optimization" for more details.
+
+
+### How to get help
+Most questions about cooccurNet will hopefully be answered by the documentation or references.
+
+*   __cooccurNet__ is updated frequently. Once you have installed cooccurNet, You can get help from the change-log.
+
+    ```{r}
+    logs <- changeLog(n=20)
+    logs
+    ```
+
+
+
+*   If you’ve run into a problem which could not be addressed by the documentation, or if you’ve found a conflict between the documentation and software itself, then please write to us: Yuanqiang Zou <jerrytsou2001@gmail.com> or Yousong Peng <pys2013@hnu.edu.cn>.
+
+
+## Quick Start 
+In this section, you'll learn to how to run the methods by using the sample data.
+
+### Get sample sequence file
+
+The __parameter__ `dataType` could be 'DNA', 'protein', 'SNP', 'RNA'. It's 'protein' by default.
+
+#### Get protein sample data file name with full path
+  
+```{r}
+dataFile=getexample(dataType="protein")
+dataFile
+```
+
+    
+#### Get DNA sample data file name with full path
+  
+```{r}
+dataFile=getexample(dataType="DNA")
+dataFile
+```
+
+    
+#### Get SNP sample data file name with full path
+  
+```{r}
+dataFile=getexample(dataType="SNP")
+dataFile
+```   
+    
+#### Get RNA sample data file name with full path
+  
+```{r}
+dataFile=getexample(dataType="RNA")
+dataFile
+```        
+    
+#### Get sample RCOS protein sequence file names (sample human H3N2 HA protein sequence file names with full path)
+  
+```{r}
+dataFiles=getexample_forRCOS()
+dataFiles
+```     
+
+### Read FASTA format sequence file
+
+To save the RAM usage by the package, we have designed the method of using prime number to stand for the nucleotides or amino acid in the data inputted. As is known to us, in the R environment an integer vector uses 4 bytes per number, while a character vector uses 8 bytes per character. Using prime number to stand for character could save half of RAM usage for storing the data inputted. Besides, when calculating the frequency of a pair of characters (nucleotide or amino acid), it is necessary to concatenate the characters in R. After replacing the characters with prime numbers, for a pair of prime numbers A and B, we found that unique number could be derived using the following formula for prime numbers (starting from 2): 
+
+               (round(A/B,5)+B)*100000                    (1)
+               
+The resulting values have a one-to-one correspondence with the pairs of nucleotide or amino acid. Therefore, the concentration of character vectors could be transformed to algebraic operation of prime number vectors, which could significantly reduce the time consumed in this process.
+
+The __parameter__ `dataFile` is a FASTA data file name with full path.
+
+#### Read protein sample data
+      
+```{r}
+data = readseq(dataFile=getexample(dataType="protein"), dataType="protein")
+data$original[1:10,1:10]
+data$matrix[1:10,1:10]
+```
+
+#### Read DNA sample data
+  
+```{r}
+data = readseq(dataFile=getexample(dataType="DNA"), dataType="DNA")
+data$original[1:10,1:10]
+data$matrix[1:10,1:10]
+```      
+
+#### Read SNP sample data 
+  
+```{r}
+data = readseq(dataFile=getexample(dataType="SNP"), dataType="SNP")
+data$original[1:10,1:10]
+data$matrix[1:10,1:10]
+```     
+
+#### Read RNA sample data 
+  
+```{r}
+data = readseq(dataFile=getexample(dataType="RNA"), dataType="RNA")
+data$original[1:10,1:10]
+data$matrix[1:10,1:10]
+```
+    
+### Pre-process the data inputted
+
+The __parameter__ `conservativeFilter` is used to filter the highly conservative columns which the ratio of some residue is larger than the conservationFilter. By default, it is set to be 0.95.
+  
+```{r}
+data = readseq(dataFile=getexample(dataType="protein"), dataType="protein")
+data_process = pprocess(data=data,conservativeFilter=0.95)
+```
+
+    
+### Generate co-occurrence network and save it into 'networkFile'
+
+For each sequence, a residue co-occurrence network would be generated. It measures the covariations between residues in the sequence. The features and properties of the network may capture important features of species, such as the antigenicity and CFR mentioned above in the section of introduction.
+
+The __parameter__ `cooccurFilter` is used to determine whether a pair of residues have perfect co-occurrence. By default, it is set to be 0.90 for the data type of protein, while it is set to be 1 for the data type of DNA, RNA, SNP and so on.
+  
+The __parameter__ `networkFile` is a file name with full path for storing the co-occurrence network for each row. In default, it is set to be 'cooccurNetwork', which is in your current workspace (`getwd()`)
+    
+```{r}
+cooccurNetwork = gencooccur(data=data_process, cooccurFilter=0.9, networkFile='cooccurNetwork')
+workspace = getwd()
+workspace
+readLines(cooccurNetwork$networkFile)
+```
+
+    
+### Generate co-occurrence network file by one command
+
+```{r}
+cooccurNetwork = coocnet(dataFile=getexample(dataType="protein"), dataType="protein",conservativeFilter=0.95, cooccurFilter=0.9, networkFile='cooccurNetwork')
+readLines(cooccurNetwork$networkFile)
+```
+
+      
+### Generate co-occurrence network module file by one command
+
+This would calculate all the modules (sub-graphs) included in each residue co-occurrence network.
+
+The __parameter__ `module` is a boolean flag to check whether the modules in each network of the networkFile would be calculated.
+  
+The __parameter__ `moduleFile` is a file name with full path  for storing the modules for co-occurrence network. It's 'cooccurNetworkModule' by default.
+  
+   
+```{r}
+cooccurNetwork  = coocnet(dataFile=getexample(dataType="protein"), dataType="protein",conservativeFilter=0.95, cooccurFilter=0.9, module = TRUE, moduleFile='cooccurNetworkModule')
+readLines(cooccurNetwork$moduleFile)
+```
+
+### Generate co-occurrence network property file by one command
+
+The __parameter__ `property` is a boolean flag to check whether the properties for each network of the networkFile, including the network diameter, connectivity, ConnectionEffcient and so on, would be calculated.
+  
+The __parameter__ `propertyFile` is file name with full path storing the properties for each network of the networkFile. It's 'cooccurNetworkProperty' by default.
+  
+```{r}
+cooccurNetwork  = coocnet(dataFile=getexample(dataType="protein"), dataType="protein",conservativeFilter=0.95, cooccurFilter=0.9, property = TRUE, propertyFile='cooccurNetworkProperty')
+readLines(cooccurNetwork$propertyFile)[1:5]
+```
+
+
+### Generate the residue co-occurence file by one command
+
+This is to calculate the pairwise residue co-occurrence score (RCOS) for all pairs of positions within the sequences. To evaluate the statistical significance of RCOS, the data would be permutated N times (N=100 in default). This process would take a long time. The RCOS was calculated in the permutated data and sorted decreasingly. The rank of the RCOS derived from the original data in the RCOSs derived from the permutated data divided by N was considered as the p-value for the ROCS.
+  
+The __parameter__ `siteCoFile` is file name with full path for storing the RCOS between all pairs of columns, and the related p-values. It's 'siteCooccurr' by default.
+  
+The __parameter__ `sampleTimes` is an integer of permutations in the simulation when calculating the p-values. It should be greater than 100.
+
+__In the example listed below, we assign 10 to the parameter `sampleTimes` only for testing purpose. Normally, It should be greater than 100.__
+  
+```{r}
+pairwiseCooccur = siteco(dataFile=getexample(dataType="protein"), dataType="protein", conservativeFilter=0.95, cooccurFilter=0.9, siteCoFile='siteCooccurr', sampleTimes=10)
+readLines(pairwiseCooccur$siteCoFile)[1:5]
+```
+
+
+### Generate the co-occurrence network, network module, network property and RCOS file by one command
+
+The __parameter__ `siteCo` is a boolean flag to check whether the residue co-occurence file would be calculated.
+
+__In the example listed below, we assign 10 to the parameter `sampleTimes` only for testing purpose. Normally, It should be greater than 100.__
+  
+```{r}
+cooccurNetwork  = coocnet(dataFile=getexample(dataType="protein"), dataType="protein",conservativeFilter=0.95, cooccurFilter=0.9, networkFile='cooccurNetwork', module = TRUE, moduleFile='cooccurNetworkModule', property = TRUE, propertyFile='cooccurNetworkProperty', siteCo=TRUE, siteCoFile='siteCooccurr', sampleTimes=10 )
+readLines(cooccurNetwork$networkFile)
+readLines(cooccurNetwork$moduleFile)
+readLines(cooccurNetwork$propertyFile)
+readLines(cooccurNetwork$siteCoFile)[1:5]
+```
+
+
+
+### Read and Plot network file
+
+#### Read and Plot a specified network (The package "igraph" must be installed and loaded firstly)
+  
+The __parameter__ `networkFile` is file name with full path for storing the co-occurrence network for each row.
+  
+The __parameter__ `networkName` is a vector of network names.
+  
+```{r}
+cooccurNetwork = coocnet(dataFile=getexample(dataType="protein"),dataType="protein")
+network_igraph = toigraph(networkFile=cooccurNetwork$networkFile, networkName=c("EPI823725"))
+plot(network_igraph[[1]])
+```
+
+    
+#### Read all networks and plot one
+  
+```{r}
+cooccurNetwork = coocnet(dataFile=getexample(dataType="protein"),dataType="protein")
+network_igraph = toigraph(networkFile=cooccurNetwork$networkFile, networkName=cooccurNetwork$xnames)
+plot(network_igraph[[2]])  
+```
+
+
+#### Save graphics as PDF or jpeg
+  
+```{r}
+workspace = getwd()
+cooccurNetwork = coocnet(dataFile=getexample(dataType="protein"),dataType="protein")
+network_igraph = toigraph(networkFile=cooccurNetwork$networkFile, networkName=cooccurNetwork$xnames)
+#save as PDF
+pdf(file="sample1.pdf")
+plot(network_igraph[[1]])  
+dev.off()
+#save as jpeg
+jpeg(file="sample1.jpeg")
+plot(network_igraph[[2]])  
+dev.off()
+workspace
+```
+
+
+## Outputs
+The outputs for the package __cooccurNet__ are listed as follows:
+
+1. A __co-occurrence network__ (`networkFile`) was given for each sequence, which could be easily transformed into the format of igraph by the function toigraph(); 
+
+2. The __inherent modules__(`moduleFile`) in each co-occurrence network and __some basic network attributes__(`propertyFile`) such as `connectivity` and `clustering coefficient` for each network were given; 
+
+3. The __extent of co-occurrence between residues__(`siteCoFile`), defined as residue co-occurrence score (RCOS), were given for all pairs of residues. 
+
+
+
+## Optimization
+During the development of __cooccurNet__, we found that __cooccurNet__ consumed lots of RAM, which may lead to crash of computer when the data inputted is large. In order to solve this RAM shortage problem, several approaches were taken into account.
+
+### Matrix type
+
+The __parameter__ `memory` indicates the type of matrix used in __cooccurNet__. It could be 'memory' or 'sparse'. If it's set to be 'memory', all data would be manipulated in the RAM by using normal matrix and package 'bigmemory'. If it's set to be 'sparse', the package "Matrix" would be used to manipulate massive matrices in memory and initialize huge sparse matrix, which could significantly reduce the RAM consumed. In default, it is set to be NULL, so that __cooccurNet__ would determine automatically whether all data is manipulated in the RAM or not, according to the size of data inputted and the RAM available for R. 
+
+__If your system has not enough RAM, you can set `memory='sparse'` to keep this program working properly.__
+  
+```{r}
+cooccurNetwork  = coocnet(dataFile=getexample(dataType="protein"), dataType="protein",conservativeFilter=0.95, cooccurFilter=0.9, networkFile='cooccurNetwork', memory='sparse')
+```
+
+
+#### RAM usage optimization for __cooccurNet__
+  
+
+
+Dimension of data inputted | Size of data inputted | RAM requirement without optimization | RAM usage after optimization |
+---------------------------|-----------------------|--------------------------------------|------------------------------|
+10 x 10                    | 400 b                 | 1.8 Kb                               | 1.6 Kb                       |
+100 x 100                  | 39 Kb                 | 1933 Kb                              | 20.7 Kb                      |
+1000x 1000                 | 3.8 Mb                | 1905 Mb                              | 1.9 Mb                       |
+10000x 10000               | 381.5 Mb              | 1862 Gb                              | 190.7 Mb                     |
+
+
+
+
+### High performance computation
+
+The __parameter__ `parallel` is a boolean flag to indicate whether the parallel function is in use or not.
+
+In the current version of __cooccurNet__ (0.1.4) , the package `parallel` from R core is in use. For better memory handling purpose, we use `FORK`, but it only supports __Unix/Mac (not Windows)__ system.
+  
+__Only if the parameter `memory = 'sparse'`, 'parallel' would take effect.__
+  
+Parallel uses `max(1, detectCores()-1)` cores. If you want to specify yours, plesae create a text file named `cores` in your workspace and put a number in it.  
+
+
+`cooccurNetwork  = coocnet(dataFile=getexample(dataType="protein"), dataType="protein",conservativeFilter=0.95, cooccurFilter=0.9, networkFile='cooccurNetwork', memory='sparse', parallel=TRUE)`
+
+
+
+### Debug your calculation
+
+The __parameter__ `debug` is a boolean flag to indicate whether the debug message will be displayed or not, it's FALSE by default. You can add it into each function.
+   
+```{r}
+data = readseq(dataFile=getexample(dataType="protein"), dataType="protein",debug=TRUE)
+```
+
+
+

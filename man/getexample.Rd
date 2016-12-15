@@ -7,10 +7,10 @@
 getexample(dataType)
 }
 \arguments{
-\item{dataType}{the type of data. It could be 'DNA' (default), 'protein', 'SNP' or 'other'}
+\item{dataType}{character, 'protein' by default. It could be 'DNA', 'RNA', 'protein', 'SNP' or 'other'.}
 }
 \value{
-file path of the example data
+character, the file path of the example data
 }
 \description{
 Get the example data

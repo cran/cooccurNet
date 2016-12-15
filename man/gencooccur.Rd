@@ -8,33 +8,36 @@ gencooccur(data = list(), cooccurFilter = NULL,
   networkFile = "cooccurNetwork", module = FALSE,
   moduleFile = "cooccurNetworkModule", property = FALSE,
   propertyFile = "cooccurNetworkProperty", siteCo = FALSE,
-  siteCoFile = "siteCooccurr", sampleTimes = 100, debug = FALSE)
+  siteCoFile = "siteCooccurr", sampleTimes = 100, debug = FALSE,
+  parallel = FALSE)
 }
 \arguments{
-\item{data}{a list return from function "pprocess()"}
+\item{data}{list, returns from the function "pprocess()"}
 
-\item{cooccurFilter}{a number in the range of 0~1. It determines whether two columns are perfect co-occurrence;}
+\item{cooccurFilter}{numeric, a number in the range of 0~1. It determines whether two columns are perfect co-occurrence. In default, for the data type of protein, it is set to be 0.9, while for the other data types, it is set to be 1.}
 
-\item{networkFile}{file name with full path for storing the co-occurrence network for each row;}
+\item{networkFile}{character, 'cooccurNetwork' be default. It is a file name with full path for storing the co-occurrence network for each row.}
 
-\item{module}{FALSE by default. If it is set to be TRUE, the modules in each network of the networkFile would be calculated.}
+\item{module}{logic, FALSE by default, to check whether the modules in each network of the networkFile would be calculated.}
 
-\item{moduleFile}{file name with full path  for storing the modules for co-occurrence network;}
+\item{moduleFile}{character, 'cooccurNetworkModule' by default. It is a file name with full path for storing the modules for co-occurrence network.}
 
-\item{property}{FALSE by default. If it is set to be TRUE, the properties for each network of the networkFile, including the network diameter, connectivity, ConnectionEffcient and so on, would be calculated.}
+\item{property}{logic, FALSE by default, to check whether the properties for each network of the networkFile, including the network diameter, connectivity, ConnectionEffcient and so on, would be calculated.}
 
-\item{propertyFile}{character,  file name with full path  for storing the modules for co-occurrence network;}
+\item{propertyFile}{character, 'cooccurNetworkProperty' by default. It is a file name with full path storing the properties for each network of the networkFile.}
 
-\item{siteCo}{FALSE by default. If it is set to be TRUE, the extent of co-occurrence between all pairs of columns would be calculated. It is defined as the ratio of rows with perfect co-occurrence.}
+\item{siteCo}{logic, FALSE by default, to check whether the residue co-occurence file would be calculated.}
 
-\item{siteCoFile}{file name with full path  for storing the extent of co-occurrence between all pairs of columns, and the related p-values. The later are calculated by simulations as follows   firstly, all columns in the data are randomly permutated; then, the pairwise siteCos are calculated. This process would be repeated N times (the value depends on the parameter sampleTimes). For each pair of columns, the rank of the original siteCo in the N siteCos derived from simulations are considered as the p-value for the original siteCo.}
+\item{siteCoFile}{character, 'siteCooccurr' by default. It is a file name with full path for storing the RCOS between all pairs of columns, and the related p-values.}
 
-\item{sampleTimes}{a integer of permutations in the simulation when calculating the p-values.}
+\item{sampleTimes}{numeric, an integer of permutations in the simulation when calculating the p-values. It should be greater than 100.}
 
-\item{debug}{FALSE by default; to indicate whether the debug message will be displayed or not}
+\item{debug}{logic, FALSE by default, indicates whether the debug message will be displayed or not.}
+
+\item{parallel}{logic, FALSE by default. It only supports Unix/Mac (not Windows) system.}
 }
 \value{
-a list and all the output file paths are attributed in it. \cr  The attribute "networkFile" stores the co-occurrence network for each row; \cr The attribute "moduleFile" is optional. When the module is set to be TRUE, it would be output. It stores the modules for co-occurrence network; \cr The attribute "propertyFile" is optional. When the property is set to be TRUE, it would be output. It stores the properties for co-occurrence network; \cr The attribute "siteCoFile" is optional. When the property is set to be TRUE, it would be output. It stores all the pairwise siteCos between columns.
+list, all the output file paths are attributed in it. \cr  The attribute "networkFile" stores the co-occurrence network for each row; \cr The attribute "moduleFile" is optional. When the module is set to be TRUE, it would be output. It stores the modules for co-occurrence network; \cr The attribute "propertyFile" is optional. When the property is set to be TRUE, it would be output. It stores the properties for co-occurrence network; \cr The attribute "siteCoFile" is optional. When the property is set to be TRUE, it would be output. It stores all the pairwise siteCos between columns.
 }
 \description{
 Construct the co-occurrence network

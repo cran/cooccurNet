@@ -3,21 +3,21 @@
 \title{cooccurNet: Co-Occurrence network computation for R}
 
 \description{
-Read and preprocess fasta format data, and construct the co-occurrence network for downstream analyses. This R package is to construct the co-occurrence network with the algorithm developed by Du (2008) <DOI:10.1101/gr.6969007>. It could be used to transform the data with high-dimension, such as DNA or protein sequence, into co-occurrence networks. Co-occurrence network could not only capture the co-variation pattern between variables, such as the positions in DNA or protein sequences, but also reflect the relationship between samples. Although it is originally used in DNA and protein sequences, it could be also used to other kinds of data, such as SNP.
+Read and preprocess fasta format data, and construct the co-occurrence network for downstream analyses. This R package is to construct the co-occurrence network with the algorithm developed by Du (2008) <DOI:10.1101/gr.6969007>. It could be used to transform the data with high-dimension, such as DNA or protein sequence, into co-occurrence networks. Co-occurrence network could not only capture the co-variation pattern between variables, such as the positions in DNA or protein sequences, but also reflect the relationship between samples. Although it is originally used in DNA and protein sequences, it could be also used to other kinds of data, such as RNA, SNP, etc.
 }
 
 \details{
 Index of functions/methods (grouped in a friendly way):
 
-1. readseq(dataFile="",  dataType="DNA", debug=FALSE)
+1. readseq(dataFile="",  dataType="protein", debug=FALSE)
 
-2. pprocess(data=list(),  conservativeFilter=0.95, debug=FALSE)
+2. pprocess(data=list(), conservativeFilter=0.95, memory=NULL, debug=FALSE)
 
-3. gencooccur(data=list(), cooccurFilter, networkFile='cooccurNetwork', \cr module=FALSE,moduleFile='cooccurNetworkModule', property=FALSE, propertyFile='cooccurNetworkProperty', siteCo=FALSE, siteCoFile='siteCooccurr', sampleTimes=100, debug=FALSE)
+3. gencooccur(data=list(), cooccurFilter=NULL, networkFile='cooccurNetwork', module=FALSE, moduleFile='cooccurNetworkModule', property=FALSE, propertyFile='cooccurNetworkProperty', siteCo=FALSE, siteCoFile='siteCooccurr', sampleTimes=100, debug=FALSE, parallel=FALSE)
 
-4. coocnet(dataFile, dataType="DNA", conservativeFilter=NULL, cooccurFilter=NULL, networkFile='cooccurNetwork', module=FALSE,moduleFile='cooccurNetworkModule', property=FALSE, propertyFile='cooccurNetworkProperty', siteCo=FALSE, siteCoFile='siteCooccurr', sampleTimes=100,  debug=FALSE)
+4. coocnet(dataFile="", dataType="protein", conservativeFilter=0.95, memory=NULL, cooccurFilter=NULL, networkFile='cooccurNetwork', module=FALSE,moduleFile='cooccurNetworkModule', property=FALSE, propertyFile='cooccurNetworkProperty', siteCo=FALSE, siteCoFile='siteCooccurr', sampleTimes=100, debug=FALSE, parallel=FALSE)
 
-5. siteco(dataFile, dataType="DNA", conservativeFilter=NULL, cooccurFilter=NULL, siteCoFile='siteCooccurr', sampleTimes=100, debug=FALSE)
+5. siteco(dataFile="", dataType="protein", conservativeFilter=0.95, memory=NULL, cooccurFilter=NULL, siteCoFile='siteCooccurr', sampleTimes=100, debug=FALSE, parallel=FALSE)
 
 6. toigraph(networkFile="", networkNames=c())
 
@@ -25,84 +25,94 @@ Index of functions/methods (grouped in a friendly way):
 
 8. getexample_forRCOS(dataType)
 
+9. changeLog(n=20)
+
 }
 
 \note{
 
 Arguments:
 
-1. data \cr
-type: list \cr
-description: it contains the DNA, protein, SNP data or other kinds of data read from the input data file.
-
-
-2. dataFile \cr
+1. dataFile \cr
 type: character \cr
-description: the file with full path of the DNA, protein, SNP data or other kinds of data.
+description: a FASTA data file name with full path.
 
+2. dataType \cr
+type: character \cr
+description: 'protein' by default, the type of data will be processed. It could be 'DNA', 'RNA', 'protein', 'SNP' or 'other'.
 
 3. conservativeFilter \cr
 type: numeric \cr
-description: a value in the range of 0~1. The column with conservative score greater than it would be filtered in the later analyses.
+description:  a number in the range of 0~1,  0.95 by default. It's used to filter the highly conservative columns which the ratio of some residue is larger than the conservationFilter.
 
 4. cooccurFilter \cr
 type: numeric \cr
-description: a value in the range of 0~1. It determines whether two columns are perfect co-occurrence.
+description:  a number in the range of 0~1. It determines whether two columns are perfect co-occurrence. In default, for the data type of protein, it is set to be 0.9, while for the other data types, it is set to be 1.
 
-5. network \cr
-type: logical \cr
-description: The default value is TRUE. It determines whether the network file is to be generated.
-
-6. networkFile \cr
+5. networkFile \cr
 type: character \cr
-description: the file with full path for storing the co-occurrence network for each row;
+description: 'cooccurNetwork' be default. It is a file name with full path for storing the co-occurrence network for each row.
 
-7. module \cr
+6. module \cr
 type: logical \cr
-description: The default value is FALSE. If it is set to be TRUE, the modules in each network of the networkFile would be calculated.
+description: FALSE by default, to check whether the modules in each network of the networkFile would be calculated.
 
-8. moduleFile \cr
+7. moduleFile \cr
 type: character \cr
-description: the file with full path for storing the modules for co-occurrence network;
+description:  'cooccurNetworkModule' by default. It is a file name with full path for storing the modules for co-occurrence network.
 
-9. property \cr
+8. property \cr
 type: logical \cr
-description: The default value is FLASE. If it is set to be TRUE, the properties for each network of the networkFile, including the network diameter, connectivity, ConnectionEffcient and so on, would be calculated.
+description:  FALSE by default, to check whether the properties for each network of the networkFile, including the network diameter, connectivity, ConnectionEffcient and so on, would be calculated.
 
-10. propertyFile \cr
+9. propertyFile \cr
 type: character \cr
-description: the file with full path for storing the modules for co-occurrence network;
+description:  'cooccurNetworkProperty' by default. It is a file name with full path storing the properties for each network of the networkFile.
 
-11. siteCo \cr
+10. siteCo \cr
 type: logical \cr
-description: The default value is FALSE. If it is set to be TRUE, the extent of co-occurrence between all pairs of columns would be calculated. It is defined as the ratio of rows with perfect co-occurrence.
+description: FALSE by default, to check whether the residue co-occurence file would be calculated.
 
-12. siteCoFile \cr
+11. siteCoFile \cr
 type: character \cr
-description: file for storing the extent of co-occurrence between all pairs of columns, and the related p-values. The later are calculated by simulations as follows: firstly, all columns in the data are randomly permutated; then, the pairwise siteCos are calculated. This process would be repeated N times (the value depends on the parameter sampleTimes). For each pair of columns, the rank of the original siteCo in the N siteCos derived from simulations are considered as the p-value for the original siteCo.
+description:  'siteCooccurr' by default. It is a file name with full path for storing the RCOS between all pairs of columns, and the related p-values.
 
-13. sampleTimes \cr
-type: integer \cr
-description: the number of permutations in the simulation when calculating the p-values.
+12. sampleTimes \cr
+type: numeric \cr
+description: a integer of permutations in the simulation when calculating the p-values. It should be greater than 100.
 
-14.debug \cr
+13.debug \cr
 type: logical \cr
-description: The default value is FALSE. It determines whether the debug messages is shown.
+description: FALSE by default, indicates whether the debug message will be displayed or not.
 
+14.memory \cr
+type: character \cr
+description:  the type of matrix, NULL by default. It could be 'memory' or 'sparse'. If it's set to be 'memory', all data would be manipulated in the RAM by using normal matrix and package 'bigmemory'. If it's set to be 'sparse', the package "Matrix" would be used to manipulate massive matrices in memory and initialize huge sparse matrix, which could significantly reduce the RAM consumed. In default, it is set to be NULL, so that the system would determine automatically whether all data is manipulated in the RAM or not, according to the size of data inputted and the RAM available for R.
+
+15.parallel \cr
+type: logical \cr
+description: FALSE by default. It only supports Unix/Mac (not Windows) system.
 
 Output files:
 
 1. networkFile \cr
 filePath = data$networkFile \cr
+description: A co-occurrence network (networkFile) was given for each sequence, which could be easily transformed into the format of igraph by the function toigraph().
 
 2. moduleFile \cr
 filePath = data$moduleFile \cr
+description: The inherent modules(moduleFile) in each co-occurrence network were given for each sequence.
 
 3. propertyFile \cr
 filePath = data$propertyFile \cr
+description: Some basic network attributes(propertyFile) such as connectivity and clustering coefficient for each network were given.
 
 4. siteCoFile \cr
 filePath = data$siteCoFile \cr
+description: The extent of co-occurrence between residues(siteCoFile), defined as residue co-occurrence score (RCOS), were given for all pairs of residues.
+
+For more details, please see the 'Vignette: Extending cooccurNet' by using the following command.
+vignette("Extending-cooccurNet",package="cooccurNet")
 
 }
 \author{
@@ -130,30 +140,30 @@ Maintainers: Yuanqiang Zou <jerrytsou2001@gmail.com>
 
   #example of pprocess()
   #preprocess the sequence dataFile
-  #data_process = pprocess(data=data)
+  #data_process = pprocess(data=data,conservativeFilter=0.95)
 
   #example of gencooccur()
   #generate co-occurrence network and save it into the 'networkFile'
-  #cooccurNetwork  = gencooccur(data=data_process)
+  #cooccurNetwork  = gencooccur(data=data_process, cooccurFilter=0.9, networkFile='cooccurNetwork')
   #check the 'networkFile' path
   #print(cooccurNetwork$networkFile)
 
   #example of coocnet()
   #also, you can generate the co-occurrence network by one command
-  cooccurNetwork  = coocnet(dataFile=dataFile, dataType="protein")
+  #cooccurNetwork  = coocnet(dataFile=getexample(dataType="protein"), dataType="protein")
   #check the 'networkFile' path
   #print(cooccurNetwork$networkFile)
 
   #example of siteco()
   #you can generate the co-occurrence network siteCoFile by one command
   #this command will take long time to calculate the p-value.
-  #pairwiseCooccur = siteco(dataFile=dataFile, dataType="protein")
+  #pairwiseCooccur = siteco(dataFile=getexample(dataType="protein"), dataType="protein")
   #check the 'siteCoFile' path
   #print(pairwiseCooccur$siteCoFile)
 
   #example of toigraph()
   #you can transform a network file to the igraph.data.frame
-  #cooccurNetwork  = coocnet(dataFile=dataFile,dataType="protein")
+  #cooccurNetwork  = coocnet(dataFile=getexample(dataType="protein"),dataType="protein")
   #get igraph data frame by specifying the network name
   #network_igraph = toigraph(networkFile=cooccurNetwork$networkFile, networkName=c("EPI823725"))
   #Plot the network (The package "igraph" must be installed and loaded firstly)
@@ -162,6 +172,8 @@ Maintainers: Yuanqiang Zou <jerrytsou2001@gmail.com>
   #Transform all cooccurrence network into the igraph format
   #Network_igraph = toigraph(networkFile=cooccurNetwork$networkFile, networkNames=networkName)
 
+  #example of changelog()
+  #logs = changeLog(n=20)
 
 
 }

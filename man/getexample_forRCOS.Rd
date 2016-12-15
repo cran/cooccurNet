@@ -7,7 +7,7 @@
 getexample_forRCOS()
 }
 \value{
-File paths for all the files available for testing RCOS.
+character, the files available for testing RCOS.
 }
 \description{
 Get the test data for testing RCOS method

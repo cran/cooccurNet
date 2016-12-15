@@ -4,24 +4,26 @@
 \alias{pprocess}
 \title{pprocess}
 \usage{
-pprocess(data=list(),  conservativeFilter=0.95, debug=FALSE)
+pprocess(data=list(),  conservativeFilter=0.95, debug=FALSE, memory=NULL)
 }
 \arguments{
-\item{data}{a list  return from function "readseq()"}
+\item{data}{list, returns from the function "readseq()".}
 
-\item{conservativeFilter}{0.95 by default. a number in the range of 0~1. The column with conservative score greater than it would be filtered in the later analyses;}
+\item{conservativeFilter}{numeric, a number in the range of 0~1,  0.95 by default. It's used to filter the highly conservative columns which the ratio of some residue is larger than the conservationFilter.}
 
-\item{debug}{FALSE by default; to indicate whether the debug message will be displayed or not}
+\item{debug}{logic, FALSE by default, indicates whether the debug message will be displayed or not.}
+
+\item{memory}{character, the type of matrix, NULL by default. It could be 'memory' or 'sparse'. If it's set to be 'memory', all data would be manipulated in the RAM by using normal matrix and package 'bigmemory'. If it's set to be 'sparse', the package "Matrix" would be used to manipulate massive matrices in memory and initialize huge sparse matrix, which could significantly reduce the RAM consumed. In default, it is set to be NULL, so that the system would determine automatically whether all data is manipulated in the RAM or not, according to the size of data inputted and the RAM available for R.}
 }
 \value{
-a list object containing the original data matrix and frequency matrix
+list, contains the original data matrix, frequency matrix and other informations.
 }
 \description{
 Filter the conservative columns (defined as the conservative score greater than the "conservativeFilter")
 }
 \examples{
 data = readseq(dataFile=getexample(dataType="protein"),dataType="protein")
-data_process = pprocess(data=data)
+data_process = pprocess(data=data,conservativeFilter=0.95)
 }
 \references{
 Du, X., Wang, Z., Wu, A., Song, L., Cao, Y., Hang, H., & Jiang, T. (2008). Networks of genomic co-occurrence capture characteristics of human influenza A (H3N2) evolution. Genome research, 18(1), 178-187. doi:10.1101/gr.6969007

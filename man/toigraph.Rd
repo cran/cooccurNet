@@ -7,9 +7,9 @@
 toigraph(networkFile="", networkNames=c())
 }
 \arguments{
-\item{networkFile}{the network file name for the co-occurrence network. It is generated from cooc() or gencooccur().}
+\item{networkFile}{character, a file name with full path for storing the co-occurrence network for each row and generated from cooc() or gencooccur().}
 
-\item{networkNames}{a vector of network names}
+\item{networkNames}{character, a vector of network names}
 }
 \value{
 a list of igraph::graph.data.frame object ordered by the input network names.

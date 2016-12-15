@@ -4,17 +4,17 @@
 \alias{readseq}
 \title{readseq}
 \usage{
-readseq(dataFile="",  dataType="DNA", debug=FALSE)
+readseq(dataFile="", dataType="protein", debug=FALSE)
 }
 \arguments{
-\item{dataFile}{the file name of data}
+\item{dataFile}{character, a FASTA data file name with full path.}
 
-\item{dataType}{the type of data. It could be 'DNA' (default), 'protein', 'SNP' or 'other'}
+\item{dataType}{character, 'protein' by default, the type of data will be processed. It could be 'DNA', 'RNA', 'protein', 'SNP' or 'other'.}
 
-\item{debug}{FALSE by default; to indicate whether the debug message will be displayed or not}
+\item{debug}{logic, FALSE by default, to indicate whether the debug message will be displayed or not.}
 }
 \value{
-a list object containing the original data matrix
+list,contains the original data matrix and some other information.
 }
 \description{
 Reading a sequence file in fasta format
