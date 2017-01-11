@@ -19,6 +19,7 @@ readseq <- function(dataFile="", dataType="protein", debug=FALSE){
   data$dataType = dataType
   cat((sprintf("completed. (%s,%s)",nrow(data$matrix),ncol(data$matrix))))
   cooccur.printTimeCost('total co-occurrence.readsequence time cost',t,debug)
+  message("")
   return(data)
 }
 
@@ -52,6 +53,7 @@ pprocess <- function(data=list(), conservativeFilter=0.95, debug=FALSE, memory=N
   data <- cooccur.dataprepreprocess.preprocess(data=data, threshold=threshold, memory=memory, debug=debug )
   cat(sprintf("Pre-process......completed. (%s,%s)",nrow(data$matrix),ncol(data$matrix)))
   cooccur.printTimeCost('total co-occurrence.getco-occurrence time cost',t,debug)
+  message("")
   return(data)
 }
 
@@ -120,6 +122,7 @@ gencooccur <- function(data=list(), cooccurFilter=NULL, networkFile='cooccurNetw
 
   data <- cooccur.gennetework.calculateNetWork(sequences=data, alpha=alpha, parallel=parallel, filterfile=filterfile, rawfile=rawfile, modulefile=modulefile, propertyfile=propertyfile, cooccurfile=cooccurfile, pvaluefile=pvaluefile, ptimes=ptimes,debug=debug)
   cooccur.printTimeCost('total co-occurrence.createco-occurrence time cost',t,debug)
+  message("")
   return(data)
 
 }
@@ -195,7 +198,7 @@ coocnet <-  function(dataFile="", dataType="protein", conservativeFilter=0.95, c
 
   filterfile = NA
   cooccurfile=NA
-
+  #cooccurfile="cooccurfile"
 
   rawfile = networkFile
 
@@ -227,6 +230,7 @@ coocnet <-  function(dataFile="", dataType="protein", conservativeFilter=0.95, c
 
   sequences <- cooccur.gennetework.calculateNetWork(sequences=sequences, alpha=alpha, parallel=parallel, filterfile=filterfile, rawfile=rawfile, modulefile=modulefile, propertyfile=propertyfile, cooccurfile=cooccurfile, pvaluefile=pvaluefile, networkpfile=networkpfile, ptimes=ptimes,debug=debug)
   cooccur.printTimeCost('total co-occurrence.createco-occurrence time cost',t,debug)
+  message("")
   return(sequences)
 
 
@@ -284,6 +288,7 @@ siteco <-  function(dataFile="", dataType="protein", conservativeFilter=0.95, co
 
   sequences <- cooccur.gennetework.calculateNetWork(sequences=sequences, alpha=alpha, parallel=parallel, filterfile=filterfile, rawfile=rawfile, modulefile=modulefile, propertyfile=propertyfile, cooccurfile=cooccurfile, pvaluefile=pvaluefile, ptimes=ptimes,debug=debug)
   cooccur.printTimeCost('total co-occurrence.createco-occurrence time cost',t,debug)
+  message("")
   return(sequences)
 
 
@@ -363,7 +368,7 @@ toigraph <-  function(networkFile="", networkNames=c()){
     graphList[[i]] = graphdf
 
   }
-
+  message("")
   return(graphList)
 }
 
@@ -395,7 +400,7 @@ getexample <- function(dataType='protein'){
   }else{
     stop("the param dataType should in the range of [DNA,RNA,protein,SNP]")
   }
-
+  message("")
   return(path)
 }
 
@@ -420,6 +425,7 @@ changeLog <- function(n=20){
   if(n>length(logs)){
     n = length(logs)
   }
+  message("")
   return(logs[1:n])
 }
 
@@ -440,5 +446,6 @@ getexample_forRCOS <- function(){
   path = system.file("extdata", "RCOS", package = "cooccurNet")
   fileName<-paste(path, dir(path) ,sep="/")
   #print(path)
+  message("")
   return(fileName)
 }

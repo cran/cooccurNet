@@ -370,3 +370,22 @@ inmemoryflag <- function(nrow, ncol){
   }
 }
 
+splitArrayByCores <- function(ptimes, cores){
+  pp = trunc(ptimes/cores)
+  if(pp==0){
+    ppmatrix = matrix(nrow=1, ncol=2)
+    ppmatrix[1,]= c(1, ptimes)
+    return(ppmatrix)
+  }
+  ppmatrix = matrix(nrow=cores, ncol=2)
+  for(i in 1:cores){
+    start = (i-1) * pp + 1
+    end = i * pp
+    ppmatrix[i,] = c(start,end)
+  }
+  if(ppmatrix[cores,2]<ptimes){
+    ppmatrix[cores,2]=ptimes
+  }
+  return(ppmatrix)
+}
+

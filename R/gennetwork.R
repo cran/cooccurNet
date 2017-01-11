@@ -142,7 +142,7 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 		t = Sys.time()
 		#cooccurrence <- lapply(seq_len(ncol(df_cooccurrence)), cooccur.gennetework.outputNetWorkcooccurrence, sequences, df_cooccurrence)
 		cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence, shuffeld=FALSE, parallel = parallel, debug=debug)
-		#print(cooccurrence)
+		print(cooccurrence)
 		cooccur.printTimeCost('cooccur.gennetework.outputNetWorkcooccurrence cooccurrence time cost',t,debug)
 		t = Sys.time()
 		#cooccur.writelist(cooccurrence,cooccurfile)
@@ -169,7 +169,20 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 		  cat(sprintf("calculating cooccurrence.........."))
 		  message("")
 		  t = Sys.time()
-		  cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence, shuffeld=FALSE, parallel = parallel, debug=debug)
+		  #2017-01-11 begin
+
+		  #cooccurrence <- cooccur.gennetework.outputNetWorkcooccurrence(sequences, df_cooccurrence, shuffeld=FALSE, parallel = parallel, debug=debug)
+		  df_cooccurrence_vector = cooccur.networkpvalue.dfcooccurrencevector(sequences$matrix,sequences,alpha,debug)
+		  len = nrow(sequences$dt_idxtable)
+		  cooccurrence = matrix(nrow=len,ncol=0)
+		  starts = colnames(sequences$matrix)[sequences$dt_idxtable[,2]]
+		  ends = colnames(sequences$matrix)[sequences$dt_idxtable[,3]]
+		  cooccurrence = cbind(cooccurrence, starts)
+		  cooccurrence = cbind(cooccurrence, ends)
+		  cooccurrence = cbind(cooccurrence, df_cooccurrence_vector)
+
+
+		  #2017-01-11 end
 		  colnames(cooccurrence) = c("Site_i","Site_j","Cooccur")
 		  cooccur.printTimeCost('cooccur.gennetework.outputNetWorkcooccurrence cooccur time cost',t,debug)
 		}else{
@@ -225,7 +238,15 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 		}
 
 		#cooccur.printTimeCost('before cooccur.networkpvalue.calculateNetWorkPvalue cooccur time cost',t,debug)
-		pvalues = cooccur.networkpvalue.calculateNetWorkPvalue(df_cooccurrence, cooccurrence, sequences, pvaluefile=pvaluefile, networkpfile=networkpfile, ptimes=ptimes, alpha=alpha, parallel=parallel, debug=debug)
+
+		#2017-01-10 test begin
+		#pvalues = cooccur.networkpvalue.calculateNetWorkPvalue(df_cooccurrence, cooccurrence, sequences, pvaluefile=pvaluefile, networkpfile=networkpfile, ptimes=ptimes, alpha=alpha, parallel=parallel, debug=debug)
+
+		rm(df_cooccurrence)
+		pvalues = cooccur.networkpvalue.calculateNetWorkPvalue.new(df_cooccurrence=NA, cooccurrence, sequences, pvaluefile=pvaluefile, networkpfile=networkpfile, ptimes=ptimes, alpha=alpha, parallel=parallel, debug=debug)
+
+		#2017-01-10 test end
+
 		#print(pvalues)
 		#}
 
@@ -264,7 +285,7 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 		}
 		cat("completed")
 		rm(cooccurrence)
-		rm(df_cooccurrence)
+		#rm(df_cooccurrence)
 		rm(pvalues)
 		gc()
 	}

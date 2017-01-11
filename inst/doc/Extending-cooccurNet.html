@@ -78,7 +78,71 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The co-occurrence network method was originally developed to capture the nucleotide co-occurrence pattern over the entire genome of human influenza H3N2 viruses [1]. It could effectively capture the evolutionary antigenic features of H3N2 virus at the whole-genome level and accurately describe the complex evolutionary patterns between individual gene segments. Besides influenza viruses, the co-occurrence network method was also used to Zaire ebolavirus (EBOV). In this work [2], we found that the features of co-occurrence networks (edges and nodes) built over the EBOV genome could accurately reflect the case fatality rate (CFR) of EBOV, which provided a novel and rapid way of assessing the CFR of EBOV even at the very beginning of the outbreak once its genome sequence is available. This suggests the potential usage of the co-occurrence network method in modeling the evolution of genomes.</p>
 <p>As we know, the genomes contain all the genetic information of an organism, the evolution of which is very complex. Currently, there is a lack of computational models for capturing the complex evolutionary features over the entire genome. Coevolution is prevalent in biology and it is an important driving force in evolution. The co-occurrence network method could capture the coevolution linkage between residues within the genome. It is unique in that it could transform a genome into a residue co-occurrence network, the features of which, such as the nodes, edges, connectivity and so on, may reflect important features of organisms, such as the antigenicity [1] and CFR [2] in the examples mentioned above.</p>
 <p>Actually, the co-occurrence network method is a general method which could be used to capture the co-occurrence pattern within samples. Besides genomes, it could be directly used in gene, protein, proteome, and so on. Due to a lack of a user-friendly software, the method is rarely used in other data type except for genomes. Based on the package “cooccurNet”, we believe the method could be widely used in biology.</p>
-<p>The <strong>RCOS</strong> method was newly proposed in the package. It is a method for measuring the association between two discrete variables. It could be used to measure the extent of residue coevolution in protein/DNA/RNA/SNP. Residue coevolution reflects the functional and structural constraints within a protein or gene. It could help for protein structure or function prediction [3-6]. Many computational methods have been developed in measure residue coevolution. Our tests show that the RCOS method achieved a similar performance with a state-of-the-art method PSICOV on a benchmark dataset [7]. Therefore, we believe the <strong>RCOS</strong> method could become an important method in measure residue coevolution.</p>
+<p>The <strong>RCOS</strong> method was newly proposed in the package. It is a method for measuring the association between two discrete variables. It could be used to measure the extent of residue coevolution in protein/DNA/RNA/SNP. Residue coevolution reflects the functional and structural constraints within a protein or gene. It could help for protein structure or function prediction [3-6]. Many computational methods have been developed in measure residue coevolution. Our tests show that the RCOS method achieved a similar performance with a state-of-the-art method PSICOV on a benchmark dataset [7]. Therefore, we believe the <strong>RCOS</strong> method could become an important method in measuring residue coevolution.</p>
+<p>There are two important parameters for both the methods of co-occurrence network and RCOS in the package “cooccurNet”. The first parameter, called as “conservativeFilter”, is used to filter the highly conservative sites for which the ratio of some residue is larger than the “conservativeFilter”. By default, it is set to be 0.95 for all data types. The second parameter, called as “cooccurFilter”, is used to determine whether a pair of residues has co-occurrence. According to the methods of co-occurrence network and RCOS, the smaller the “cooccurFilter” is, more pairs of residues would have co-occurrence and more false positives would be observed. To investigate the influence of this cutoff on the RCOS method, we used the RCOS method with cutoffs ranging from 0.8 to 1 to identify the structural constraints between residues based on the benchmark dataset derived from Jones’s work [5]. As shown in Table 1 below, as the cutoff increased, the number of residue pairs with significant co-occurrence decreased, while the ratio of residue pairs in contact among the top L/10, L/5, L/2 and L ranked pairs of residues increased. When the cutoff was set to be 1, only a few residue pairs with significant co-occurrence could be identified for most Pfam families. For balance of these two measures, we defined this cutoff to be 0.9 in default for the protein in the package. While for the other data types, such as DNA, RNA and SNP, “cooccurFilter” was set to be 1 in default. Both the parameters “conservativeFilter” and “cooccurFilter” could be re-set in the package.</p>
+<p><strong>Table 1</strong>: Performance of the RCOS method with the cutoff of “cooccurFilter” ranging from 0.8 to 1. For each value of the cutoff, it lists the average number of pairs of residues with significant co-occurrence (p-value &lt; 0.05) identified by the RCOS method, and the ratios of residue pairs in contact among the top L/10, L/5, L/2 and L ranked pairs of residues for 150 Pfam families by the method of RCOS. “*“, not applicable due to fewer than L/10 pairs of residues with significant co-occurrence were identified.</p>
+<table style="width:117%;">
+<colgroup>
+<col width="22%"></col>
+<col width="55%"></col>
+<col width="9%"></col>
+<col width="9%"></col>
+<col width="9%"></col>
+<col width="9%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Co-occurFilter</th>
+<th align="left">Average number of co-occurrence pairs</th>
+<th align="left">L/10</th>
+<th align="left">L/5</th>
+<th align="left">L/2</th>
+<th align="left">L</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0.8</td>
+<td align="left">221</td>
+<td align="left">0.59</td>
+<td align="left">0.56</td>
+<td align="left">0.47</td>
+<td align="left">0.36</td>
+</tr>
+<tr class="even">
+<td align="left">0.85</td>
+<td align="left">153</td>
+<td align="left">0.66</td>
+<td align="left">0.62</td>
+<td align="left">0.49</td>
+<td align="left">0.37</td>
+</tr>
+<tr class="odd">
+<td align="left">0.9</td>
+<td align="left">95</td>
+<td align="left">0.76</td>
+<td align="left">0.69</td>
+<td align="left">0.54</td>
+<td align="left">0.42</td>
+</tr>
+<tr class="even">
+<td align="left">0.95</td>
+<td align="left">51</td>
+<td align="left">0.85</td>
+<td align="left">0.75</td>
+<td align="left">0.57</td>
+<td align="left">0.45</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">6</td>
+<td align="left">-*</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+</tr>
+</tbody>
+</table>
 <p><strong>References:</strong></p>
 <p>[1] Du X, Wang Z, Wu A, et al. Networks of genomic co-occurrence capture characteristics of human influenza A (H3N2) evolution[J]. Genome research, 2008, 18(1): 178-187.</p>
 <p>[2] Deng L, Liu M, Hua S, et al. Network of co-mutations in Ebola virus genome predicts the disease lethality[J]. Cell research, 2015, 25(6): 753.</p>
@@ -103,10 +167,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul>
 <li><p><strong>cooccurNet</strong> is updated frequently. Once you have installed cooccurNet, You can get help from the change-log.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">logs &lt;-<span class="st"> </span><span class="kw">changeLog</span>(<span class="dt">n=</span><span class="dv">20</span>)
+<span class="co">#&gt; </span>
 logs
-<span class="co">#&gt; [1] &quot;2016-12-16 Yuanqiang Zou  &lt;jerrytsou2001@gmail.com&gt;&quot;</span>
-<span class="co">#&gt; [2] &quot;&quot;                                                   </span>
-<span class="co">#&gt; [3] &quot;\tDocument synchronization and testoutputs.&quot;</span></code></pre></div></li>
+<span class="co">#&gt; [1] &quot;2016-12-16 Yuanqiang Zou  &lt;jerrytsou2001@gmail.com&gt;&quot;           </span>
+<span class="co">#&gt; [2] &quot;&quot;                                                              </span>
+<span class="co">#&gt; [3] &quot;\tDocument synchronization and test outputs.&quot;                  </span>
+<span class="co">#&gt; [4] &quot;&quot;                                                              </span>
+<span class="co">#&gt; [5] &quot;2017-01-10 Yuanqiang Zou  &lt;jerrytsou2001@gmail.com&gt;&quot;           </span>
+<span class="co">#&gt; [6] &quot;&quot;                                                              </span>
+<span class="co">#&gt; [7] &quot;\tModifiy documentaion and import a new package \&quot;doParallel\&quot;&quot;</span></code></pre></div></li>
 <li><p>If you’ve run into a problem which could not be addressed by the documentation, or if you’ve found a conflict between the documentation and software itself, then please write to us: Yuanqiang Zou <a href="mailto:jerrytsou2001@gmail.com">jerrytsou2001@gmail.com</a> or Yousong Peng <a href="mailto:pys2013@hnu.edu.cn">pys2013@hnu.edu.cn</a>.</p></li>
 </ul>
 </div>
@@ -120,32 +189,37 @@ logs
 <div id="get-protein-sample-data-file-name-with-full-path" class="section level4">
 <h4>Get protein sample data file name with full path</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFile=<span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
+<span class="co">#&gt; </span>
 dataFile
-<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/protein&quot;</span></code></pre></div>
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpeM4K7n/Rinst1d4879d4213/cooccurNet/extdata/protein&quot;</span></code></pre></div>
 </div>
 <div id="get-dna-sample-data-file-name-with-full-path" class="section level4">
 <h4>Get DNA sample data file name with full path</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFile=<span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;DNA&quot;</span>)
+<span class="co">#&gt; </span>
 dataFile
-<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/DNA&quot;</span></code></pre></div>
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpeM4K7n/Rinst1d4879d4213/cooccurNet/extdata/DNA&quot;</span></code></pre></div>
 </div>
 <div id="get-snp-sample-data-file-name-with-full-path" class="section level4">
 <h4>Get SNP sample data file name with full path</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFile=<span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;SNP&quot;</span>)
+<span class="co">#&gt; </span>
 dataFile
-<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/SNP&quot;</span></code></pre></div>
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpeM4K7n/Rinst1d4879d4213/cooccurNet/extdata/SNP&quot;</span></code></pre></div>
 </div>
 <div id="get-rna-sample-data-file-name-with-full-path" class="section level4">
 <h4>Get RNA sample data file name with full path</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFile=<span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;RNA&quot;</span>)
+<span class="co">#&gt; </span>
 dataFile
-<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/RNA&quot;</span></code></pre></div>
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpeM4K7n/Rinst1d4879d4213/cooccurNet/extdata/RNA&quot;</span></code></pre></div>
 </div>
 <div id="get-sample-rcos-protein-sequence-file-names-sample-human-h3n2-ha-protein-sequence-file-names-with-full-path" class="section level4">
 <h4>Get sample RCOS protein sequence file names (sample human H3N2 HA protein sequence file names with full path)</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataFiles=<span class="kw">getexample_forRCOS</span>()
+<span class="co">#&gt; </span>
 dataFiles
-<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rinst378865a852ad/cooccurNet/extdata/RCOS/HA1protein_humanH3N2&quot;</span></code></pre></div>
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpeM4K7n/Rinst1d4879d4213/cooccurNet/extdata/RCOS/HA1protein_humanH3N2&quot;</span></code></pre></div>
 </div>
 </div>
 <div id="read-fasta-format-sequence-file" class="section level3">
@@ -158,7 +232,10 @@ dataFiles
 <div id="read-protein-sample-data" class="section level4">
 <h4>Read protein sample data</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
-<span class="co">#&gt; Reading file......completed. (10,329)</span>
+<span class="co">#&gt; Reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
+<span class="co">#&gt; </span>
 data$original[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
 <span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span>
 <span class="co">#&gt;  [1,] &quot;Q&quot;  &quot;K&quot;  &quot;I&quot;  &quot;P&quot;  &quot;G&quot;  &quot;N&quot;  &quot;D&quot;  &quot;N&quot;  &quot;S&quot;  &quot;T&quot;  </span>
@@ -187,7 +264,10 @@ data$matrix[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv
 <div id="read-dna-sample-data" class="section level4">
 <h4>Read DNA sample data</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;DNA&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;DNA&quot;</span>)
-<span class="co">#&gt; Reading file......completed. (213,987)</span>
+<span class="co">#&gt; Reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (213,987)</span>
+<span class="co">#&gt; </span>
 data$original[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
 <span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span>
 <span class="co">#&gt;  [1,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;T&quot;  &quot;T&quot;  &quot;C&quot;  </span>
@@ -216,7 +296,10 @@ data$matrix[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv
 <div id="read-snp-sample-data" class="section level4">
 <h4>Read SNP sample data</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;SNP&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;SNP&quot;</span>)
-<span class="co">#&gt; Reading file......completed. (100,50)</span>
+<span class="co">#&gt; Reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (100,50)</span>
+<span class="co">#&gt; </span>
 data$original[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
 <span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span>
 <span class="co">#&gt;  [1,] &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;1&quot;  &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;  </span>
@@ -245,7 +328,10 @@ data$matrix[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv
 <div id="read-rna-sample-data" class="section level4">
 <h4>Read RNA sample data</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;RNA&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;RNA&quot;</span>)
-<span class="co">#&gt; Reading file......completed. (45,987)</span>
+<span class="co">#&gt; Reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (45,987)</span>
+<span class="co">#&gt; </span>
 data$original[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv">1</span>:<span class="dv">10</span>]
 <span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span>
 <span class="co">#&gt;  [1,] &quot;C&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;A&quot;  &quot;C&quot;  &quot;U&quot;  &quot;U&quot;  &quot;C&quot;  </span>
@@ -276,13 +362,17 @@ data$matrix[<span class="dv">1</span>:<span class="dv">10</span>,<span class="dv
 <h3>Pre-process the data inputted</h3>
 <p>The <strong>parameter</strong> <code>conservativeFilter</code> is used to filter the highly conservative columns which the ratio of some residue is larger than the conservationFilter. By default, it is set to be 0.95.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
-<span class="co">#&gt; Reading file......completed. (10,329)</span>
+<span class="co">#&gt; Reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
+<span class="co">#&gt; </span>
 data_process =<span class="st"> </span><span class="kw">pprocess</span>(<span class="dt">data=</span>data,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>)
 <span class="co">#&gt; Pre-processing......</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Calculating bigram frequency ......</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Pre-process......completed. (10,42)</span></code></pre></div>
+<span class="co">#&gt; Pre-process......completed. (10,42)</span>
+<span class="co">#&gt; </span></code></pre></div>
 </div>
 <div id="generate-co-occurrence-network-and-save-it-into-networkfile" class="section level3">
 <h3>Generate co-occurrence network and save it into ‘networkFile’</h3>
@@ -297,7 +387,7 @@ data_process =<span class="st"> </span><span class="kw">pprocess</span>(<span cl
 <span class="co">#&gt; </span>
 workspace =<span class="st"> </span><span class="kw">getwd</span>()
 workspace
-<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rbuild378824b746dc/cooccurNet/vignettes&quot;</span>
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpeM4K7n/Rbuild1d485ab04e90/cooccurNet/vignettes&quot;</span>
 <span class="kw">readLines</span>(cooccurNetwork$networkFile)
 <span class="co">#&gt;  [1] &quot;EPI823725 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                </span>
 <span class="co">#&gt;  [2] &quot;EPI775768 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261 267-312&quot;                                                                                  </span>
@@ -313,7 +403,9 @@ workspace
 <div id="generate-co-occurrence-network-file-by-one-command" class="section level3">
 <h3>Generate co-occurrence network file by one command</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">networkFile=</span><span class="st">'cooccurNetwork'</span>)
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......</span>
 <span class="co">#&gt; </span>
@@ -343,7 +435,9 @@ workspace
 <p>The <strong>parameter</strong> <code>module</code> is a boolean flag to check whether the modules in each network of the networkFile would be calculated.</p>
 <p>The <strong>parameter</strong> <code>moduleFile</code> is a file name with full path for storing the modules for co-occurrence network. It’s ‘cooccurNetworkModule’ by default.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork  =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">module =</span> <span class="ot">TRUE</span>, <span class="dt">moduleFile=</span><span class="st">'cooccurNetworkModule'</span>)
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......</span>
 <span class="co">#&gt; </span>
@@ -374,7 +468,9 @@ workspace
 <p>The <strong>parameter</strong> <code>property</code> is a boolean flag to check whether the properties for each network of the networkFile, including the network diameter, connectivity, ConnectionEffcient and so on, would be calculated.</p>
 <p>The <strong>parameter</strong> <code>propertyFile</code> is file name with full path storing the properties for each network of the networkFile. It’s ‘cooccurNetworkProperty’ by default.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork  =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">property =</span> <span class="ot">TRUE</span>, <span class="dt">propertyFile=</span><span class="st">'cooccurNetworkProperty'</span>)
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......</span>
 <span class="co">#&gt; </span>
@@ -402,7 +498,9 @@ workspace
 <p>The <strong>parameter</strong> <code>sampleTimes</code> is an integer of permutations in the simulation when calculating the p-values. It should be greater than 100.</p>
 <p><strong>In the example listed below, we assign 10 to the parameter <code>sampleTimes</code> only for testing purpose. Normally, It should be greater than 100.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pairwiseCooccur =<span class="st"> </span><span class="kw">siteco</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>, <span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">siteCoFile=</span><span class="st">'siteCooccurr'</span>, <span class="dt">sampleTimes=</span><span class="dv">10</span>)
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......</span>
 <span class="co">#&gt; </span>
@@ -416,27 +514,13 @@ workspace
 <span class="co">#&gt; </span>
 <span class="co">#&gt; 2. creating siteCoFile (siteCooccurr), sampleTimes: 10 ......</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (1) ......</span>
+<span class="co">#&gt; [1] 1 3</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (2) ......</span>
+<span class="co">#&gt; [1] 4 6</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (3) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (4) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (5) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (6) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (7) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (8) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (9) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (10) ......</span>
-<span class="co">#&gt; </span>
+<span class="co">#&gt; [1]  7 10</span>
 <span class="co">#&gt; completed</span>
+<span class="co">#&gt; </span>
 <span class="kw">readLines</span>(pairwiseCooccur$siteCoFile)[<span class="dv">1</span>:<span class="dv">5</span>]
 <span class="co">#&gt; [1] &quot;Site_i Site_j Co-occur p-value&quot; &quot;3 25 0 1&quot;                      </span>
 <span class="co">#&gt; [3] &quot;3 33 0 1&quot;                       &quot;3 43 0 1&quot;                      </span>
@@ -447,7 +531,9 @@ workspace
 <p>The <strong>parameter</strong> <code>siteCo</code> is a boolean flag to check whether the residue co-occurence file would be calculated.</p>
 <p><strong>In the example listed below, we assign 10 to the parameter <code>sampleTimes</code> only for testing purpose. Normally, It should be greater than 100.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork  =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">networkFile=</span><span class="st">'cooccurNetwork'</span>, <span class="dt">module =</span> <span class="ot">TRUE</span>, <span class="dt">moduleFile=</span><span class="st">'cooccurNetworkModule'</span>, <span class="dt">property =</span> <span class="ot">TRUE</span>, <span class="dt">propertyFile=</span><span class="st">'cooccurNetworkProperty'</span>, <span class="dt">siteCo=</span><span class="ot">TRUE</span>, <span class="dt">siteCoFile=</span><span class="st">'siteCooccurr'</span>, <span class="dt">sampleTimes=</span><span class="dv">10</span> )
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......</span>
 <span class="co">#&gt; </span>
@@ -467,27 +553,13 @@ workspace
 <span class="co">#&gt; </span>
 <span class="co">#&gt; 5. creating siteCoFile (siteCooccurr), sampleTimes: 10 ......</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (1) ......</span>
+<span class="co">#&gt; [1] 1 3</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (2) ......</span>
+<span class="co">#&gt; [1] 4 6</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (3) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (4) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (5) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (6) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (7) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (8) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (9) ......</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     calculating shuffled network (10) ......</span>
-<span class="co">#&gt; </span>
+<span class="co">#&gt; [1]  7 10</span>
 <span class="co">#&gt; completed</span>
+<span class="co">#&gt; </span>
 <span class="kw">readLines</span>(cooccurNetwork$networkFile)
 <span class="co">#&gt;  [1] &quot;EPI823725 3-144 3-159 3-311 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 140-158 144-159 144-311 159-311 186-219 186-278 208-238 208-261 219-278 238-261&quot;                                                                </span>
 <span class="co">#&gt;  [2] &quot;EPI775768 43-45 43-48 43-186 43-219 43-278 45-48 45-186 45-219 45-278 48-186 48-219 48-278 53-114 53-203 62-259 92-194 114-203 121-216 128-142 140-158 159-326 186-219 186-278 208-238 208-261 219-278 238-261 267-312&quot;                                                                                  </span>
@@ -534,7 +606,9 @@ workspace
 <p>The <strong>parameter</strong> <code>networkFile</code> is file name with full path for storing the co-occurrence network for each row.</p>
 <p>The <strong>parameter</strong> <code>networkName</code> is a vector of network names.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>),<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......</span>
 <span class="co">#&gt; </span>
@@ -547,13 +621,16 @@ workspace
 <span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
 <span class="co">#&gt; </span>
 network_igraph =<span class="st"> </span><span class="kw">toigraph</span>(<span class="dt">networkFile=</span>cooccurNetwork$networkFile, <span class="dt">networkName=</span><span class="kw">c</span>(<span class="st">&quot;EPI823725&quot;</span>))
+<span class="co">#&gt; </span>
 <span class="kw">plot</span>(network_igraph[[<span class="dv">1</span>]])</code></pre></div>
-<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 </div>
 <div id="read-all-networks-and-plot-one" class="section level4">
 <h4>Read all networks and plot one</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>),<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......</span>
 <span class="co">#&gt; </span>
@@ -566,14 +643,17 @@ network_igraph =<span class="st"> </span><span class="kw">toigraph</span>(<span 
 <span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
 <span class="co">#&gt; </span>
 network_igraph =<span class="st"> </span><span class="kw">toigraph</span>(<span class="dt">networkFile=</span>cooccurNetwork$networkFile, <span class="dt">networkName=</span>cooccurNetwork$xnames)
+<span class="co">#&gt; </span>
 <span class="kw">plot</span>(network_igraph[[<span class="dv">2</span>]])  </code></pre></div>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeAAAAHgCAMAAABKCk6nAAAA81BMVEUAAAAAACAAADgAAE4AAGMAAHcAAIsAAJEAAJUAAJ8AALMAJE4AJpsAOscAPzgARJ8AZtoXAIsmX6Q0AGM0AHc0AIs0JE40Pzg0WiA0Wk46AIs6AJ86Osc6kO1cAGNcAHdcAItcJE5cPzhccgBfkalmAItmALNmOsdmtv95qamBJGOBJIuBWneBcgCBiQCQOouQOrOQtv+Q2/+RX5GRqamkP2OkP3ekP4uknwCknzipeZWpqam2Zou2///FWnfFnwDbkJ/b///mcjjmck7mcmPmiSDmiU7mnwDmnyDmnzj/trP/tsf/28f/2+3//9r//+3///+9S28iAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAVGElEQVR4nO2dC3sbxRWGN7GlFgwmLSSYpAUXNTQQCDSQSqBUDrB47ZAa/f9f05kzl13JshRrZ3Zmv/3e5yHGl0c72lc7tzNzplgSaIrUBSBxoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgZnGIKrQlGlLkUShiBYy1WoL6lLkoABvGexaxjAu10H/y03/A7RMPw7XvE7QMPob3jN7/AMY7/fq8fj8URrPb8/Hh+rr9Px+O+pC9UtIII3j4P++G5WLMTwYiymp8fV3dNhGYYQfNM46PfnRXXxVD25l59L9Xz+4ayqDt/9b5pSpgFB8JZxUCFPbVWamro8VIIPHj5JUspEAAjeNg7ST/BE/TeWJrgcPaPg3rF1HFRU5w/O9I+V40l1eXp0Vh2+8zxRSZPQe8Hbx0FV8Z9n9ue6qtad6THb4F4hghdj1bpenkpL69/RXLEcTZz48li+3Pn2lr3ongcq+i64UoIvT3Xn6eKrWaXHRCJD5Cpe31GP7TdGsFE9ev/n27z+7kBF5h+AvgsWv/Js/vqsMmOiwspVvFY1sn649RBJ2uKLW1bQOwMV2Ueqci3X26LHQcagb2jrt/RK+1XdZ930qu6V/nq7+nlnoCL/SFWmxXprCvUAf3Jqn1IZE20aC+8pYWegogeRqjxL9fYUVTl+MLt42qiHr72lfavRnYGKPkSqsizULagKmZ4qTUxBj4k2dXj26Qj5QMXF06MzY3C02oL3IlKVY5luhRF8eSohhUm4u+wDFWr0ZQTrzvrKX5if29GZ/iAc3KqD3g39Fyxuzz9Sz255osdEgd6RD1Soz40Vebzy4bky4t3oTIs+OAtz7ZD0XvCyWKhH2EYU1Jgo3BuygQonWHfWV168kJ/70Zn+uwzvZoZFui3FVCIJCxkT3Q34uqZTbgWbzvqX87kfZRvBfnRGwdGINBj1gQoRKZ1128kSy/NasP8gZHg3MyzS7YkzneQDFUawrqHLcSPUWAv2H4QM72aGRdqHKBPCLlBRC7563BBcjZxg90FgJ6tX+ECFbYMnVfHmUTOW7AQv3AeBw6Q+UQcqpiJyoTroL+81/8IKNqMzCu4ZLlAhExl6qU+lvr238icvD7Tg0n8QxreLRHYDBW9lSwddT2Uq8Qv/QVBfMlwNRMHb2dFBZ7iw/2zvoDPgDw+X7JCUUDA4FAwOBYNDweBQMDgUDA4Fg0PB4FAwOBQMDgWDQ8HgUDA4FAwOBYOTXnDmAfO+k1pw9kte+k7i+5r/orW+k/a29iDHRd9Jelf7kOOi76S8qb3IcdF3Et5Tm+OikeTkMMe9Hz0nnWCb46JOclJdjo8oODQJn2C/gdp9ffF1jtvzek5GgstJlvsve04+gi8/z3ODbc/JR/CLGQVHIKFgn+NCBOs98iN2soKTcui5IngqG6nHgzowowuyEay5ZTZ28hakFGxyXLgkJ1VVfP/eDyt/wEhiexJOdJgcF3WSk2L56v2f5/UfMJIYguzChf68BUYSg5D63m14TI3iXkYSM2xT0t+6DTdFKY4USYxqIMs2JYeyzK//KE4kMa6BPNuUHIpyTbA/LmFhvup+WIABclwDmbYpOZRkXbA/LqE8nOkcoJefzqrRYesTB+MayHV1Sg4FWRfsjkuQPNvl0dlvOtnrqG2WwLgGsl2dkkM5rrfB5rgEOWlD/lFf2ubqj2rAtyn2nExJYJlH4spcBeunt3FgzvmDlgV164P0KXf6gIXp+Jan3G19cdem2HMydZ9hnEnu2VwF6yz5tWD1RLRrg936IHm2JlI/3D0NZtgfwWPPyfxFJxc+DPcBakOegs1xCSL4/L7UfaOWD1zhVxXIc/yheuXDgCdF2yN4mudktu40hCFPwea4hGYbfOtzndewgkvTVspH5+BhuNikaVOa52ReZrJ4IU/BP8lxCdKLtrHE4mU7G0bwxVOTvLvU0Y2wgqVNaZyTWd4J9uKtSC1449zhTzZLvhoimT5WVbz5W7sHwq8PUo71o6a+OwzYzW20KfaczNGzYC/eisR7kzbNHc6/d1ny7UxWGaBLWp+BI42l7kzf8jDw7Yx8zW8+krnU0NnsTfLliBUurAWX0tNt3aqvYI7gqc/JzKaGzmdvkgsHN34dNDTQEGymJEKuD3JH8LhzMrPpQ6ddNnttZsmf+2gJGdxz64PsOXQXIStofwRPZc7JrKq7/8qkhk4o+Prc4YbhUijs+iDd9Moa3fsB57EcDBeuXdnPG9oztKMXJbKBOQP+TarCzRvqaKBuvOKvdYlrYM4lOysX9vOGEg387FknFVtMAxFbmBakFFz6GFt1/nFXLVc0DXn6TSnYzRv6nm2vBWfqN+kTbOcNTTRwNljBcRvupJ0sO28oik866GQtM/Qbu+udehxs5w0vnp70+gHe32/swXNywbabNZ30UbCvXfd92fhrbRNPVZrelXztpiQhBde1axC/cQwnFPxmbOYNS/naUUECCm5fu3ax1ja7cGFkwgluX7u6lZ6y+DvY/o01Mgz4RyWY4Pa161WdAU4vMLn4alaNwhtOPS/e5extyGuFqF2LOgOc+p9fn+kg5r0wxWtcJPQLZkvI2sLvZLB5NverXYs6A5yrqyl4b0K291dfzIqF3cIgizX3q13rtdp+RSBeFd0VQQec//u5MPEvu6p3z9q1qDPAWcHn4ZfqDURw6AFnYeJfjRRQe9SuZqWnzgDnXiXCWtthCA4+4CzcDI0XvE/tOmpkgJOgC9o4uCNcl8guDZJHpeWau9HYblHxgvepXf1KT7uv5qRYvvl3m2JtYACCXZdId4XqTZ7tXrMqdPyrKXif2tWv9Fy4Gb2gi/GFAQh2XSLpCrlNnq3raB3/agjeo3Z1meDsq8imcQ6T9sJ3iepNnq0F6/hXLXjv2hU4XNghvkvU2OTZtio8MC85dbtS961dcQP+HeK7RPUmz1aNnd6p8n5R+Tyb7WpX0CU7XeK7RJXb5FmU7eeMAtauEVfsDUJw3SVymzyLq8ftJwXD1a4U3BLbJSpP3CbP4s2jENv/AtWuMZfcDkOw6RKVfpNnsXx5L3WRGlBwK1yXaOE3ecYYb7aBggOQ5+ZOAwWHIMvNnQYKDkOGmzsNFAwOBYNDwcDEbjcoOCnxe34UnJIOxm4UnJAuzvGg4HR0co4HBSejm3M8KDgVdm+hX+o5jTNBTsGJuKp3vchSz+nRWTG9F/46FJyKot71ImdEnVTVYYSDWig4FUW962V6bLYpjiIc1ELBqagFy9kU5/ePo2SJp+BU1ILNot5yfAiWhGXg1KdI6KWeqrf1Y/vF2hug4GQ4wQszSjqpipfsZCExcrte/FLPqy/CP8IUnAyzt9Au9VS96GL5mk8wDnZvoV/qeRHpvFIKTgnDhegw4A8Pl+yQVlAwOBQMDgWDQ8HgUDA4FAwOBYNDweBQMDgUDA4Fg0PB4FAwOBQMDgWDQ8HgUDA4FAwOBYNDweBQMDgUDA4Fg0PB4FAwOBQMTkaCs03I3muyEZzxkQq9JpfbefNO2Q4fbMQ6JBPBNybW7fDBxqxD8ngzNybW7fC0o5wPVmpBFu/lxsS6XWTM7vpSHbcDOQi2iXV1Qt1jc4NH5njfTjJmG7q6VOftQAaCbWJdOUxbn8BeXZ4ezvQvusmYvezyUt23AxkItlkbJaFuqf7v8vTYvHu5G/onLmt2rMLqlEaSbm4RNzl3l02Ov2QnV9mOE6z+XSjJU32A81I3VvI0a+Wf6jNh1U/jNF1/fDcrJCl3eTjTGefiJefursmpr9nFRXZg867qhLr/0A/wJ6eSllNux4uv1e9+0w/xZ89i3ZLfnxc2KfdEaoxYybk7bHIaF+3gGrtwiXVLfXqz+vfB7GL85y/n+n6UE5d09/zjiHekkKTc5x+pz5D6J1Zy7kLq/pMqepOzctEOrrELm1j34qsfVe9K15NVUY6f6Ptx+XllBZucyvEE66dXX7nSdXSc5NyqhVGfosvTE39QQxejpRwE27yr0xNp/UTw1WMR/GJmBS/kbPaIgvUHyAuOk5xbXeTDmTT07qCGLh7hfATLnVXdKUms++bRc/WJP/+mck+wUnwS7xNfFToptwg+vz+JlJy7qC8gPfUBCZbEutLy6UHRQj09L++pHxdTScVqRi665xOvsCN9DdcGR0rOrQSPnnnB0qMbhmCbWFe95bGZ8VBOP1A/l16Wf4Kr6STe/Xh9RyfllnuurhcpOXdhxnxi2XYqhiFYWJ/imc/n5oe+F/3gLJ5fk5Rb1x9abqTk3KqFOb9vLlSZgxoG08nSrEzSzsWvGNaCdVb0o3h+X7mk3G4mSyfnfu+H4NcpXFNT2YMa8IdJdWRl7r+Z2yPPRXHKcGHz4PUgIaBGk2MOakAX3Hho3c0Uu/4b9b8pA/7zG3+z7xXU8ysVtDmoAX2qsvnI1IJt5Wy/XXmwo7P+nNqiBKtG3ph5LHtQw91Wr/W2pBO8MbIyn69UjfI0z22N3UWkfP1jtNZMtG4oBhQu3BBZsV2r+iab7+xj1Eldfa2emM/DhoAGE/DfEFkxD+py2WyQl+4B7uijf70hCB4CGsSSHR9hl+mrSqIsf5XfNAQ3+lqdRcrXBbuChjynu4veRE0SwT7CfulW6xxXd08lPrdJ8DJwNbmFtZvvCupWHARZCjAAwS7CXtlhoURZDmWdna+nm4K7i5Sv3XxXULfiIMhSgAEIdhF2J1iiLAcPnyybgv19mDcWZ9mVl7FKvbEJNgWVFQdBlgIMRLDM7DvBev5dBK/NZgnzenGWW3kZq5OySbAtqFlxEGIpwEAEmxtmBIu8wz/9sx5DzOf1hMe8XpzlV15GKvYmwaagdsVBiKUAgxBsIuxOsImyvLs+tTW31Iuz/MrLzgT7gsqKgxBLAbr1m2wcPJpUDcGKO9/e2dyNmjcXZ9mVl90J9gU1tUeApQDDEGwi7E3Bo4OzzR3l+criLLPyMobgzRMQvqCy4iDEUoBBCHYRdtNr0o+HDYNvMKwnof3iLLvyMnwn64YpxJ98QaUtbrkUIMX+4ySCfYRdTxCpHrRqgv9iZookzqL71HbGyPS16sVZduVl8FLfMBP6vS2oWXFQtTunO83+4zzChXfcjNHp2NxKmTH6wMUefKTcrbwMXerNM6GuHx9mHjzR/uM8Av5uxugXGYmcrMwYuYid70WXR1H9NheFXStooGt0eNdzWbJTzxjp5WjNGaPm4iyz8jKyX4lsrXWFWreeKfadmQt3dqXt+BmjSoZB9YxR0GpyEz6ypXsAuj918fQg+IK7JPvOzJW7utAO/NSWrEdrzBi50FKsLoqPbMm+c/kyPjgLe41mDoMTIzjC5sXN5CK4njGSr2bGqLHoch5rkOEjW3rfuX2QQzcCV3VUVO8905+i8dHABPsZI6mhZcZofFA/szFnB2zzP/Uj8eCC7QZZt/es0jPr4Xcv3nDpbi6zEz9jVJr9s5Oq0FF222BFnf0xzb/Zdz6LKbjee1ZOFgMTXE9tmRr66VFhA8DxuyR276jed25WLUcT7Pae6Zn1YQmuN4+YGlpmjI4ak9NxE1f5vaOlmU4L3skq6qiotqxn1ocl2NAcCnU5rJDmv979HeHm2xwGdu+ZbopGg+tkaeqhUGORjr4rxzEFm+Zf3MoO4RhP18hVR3qOzs6sPwl9kY1kJdgPhRqLdCT+EDOdhWv+9apJM5m2dzjhZrxgFx4dDW0cvEq9SEd3SKLW0XXzbzMpXqpv33ke+CovTbTb9uLUu3lFwTaDUmknEuMWNG6ox+YwUI3NibsGBdtFOjq6IA9W5ILGD9YOMFx4M81FOtpxF/lKoi+3GFzAfwurGZRiroTulMEs2dnNSgalqow6TMIm0xu3mkGpjJhBCZ1cb1xXGZTgyfbO2UU6eh4rYgYlfPK9daCnoHRNxvcO8xyjrsn65iGeRNY1WQsm7aFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaHgt6eXGy0o+G3p6VapfpU2IX3d7NirwiYk1ZELrelTWROS7MiF1vSoqAlJd+RCa/pT0oT84VMbly59ZjeZRANAwbtxRy64/Kjl4ezuaV8MU7Bjyyi3cPl+7CHGkw5PTWkLBRu2jnKdYJMfVZJKHzwKnZA2EhQsbB/lWsE2P6rkhr/7uCd1NAVrdoxyrWCbH5WCe8eOUe7cHLng8qNqwcX5QwruDdtGueYAYxHs8qPqNrh4wza4N7hRrjn9w59N7eRqVo5c0L3o7lLyt4WC/SjXnP7hz6ZunjBrj1yw+VHLo+KqL00wBTf7yJrm2dQWe+SCF1yNOJPVJ6xge/pH82zqlb/q40T0koKXTrA//aM+m3rtzxjw7yl+ItKc/lGfTb0Ol+z0k8r3keXkM3M2depCBYOCG4MgffqHnE39si+DoN1Q8IrgiTmb+uoLmEeYghujXH1QtD6bevmaTzAO9cGCZsJDn02N45eCDX0d5e4G7O3sTU9HubtBez/708tR7m4oGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAoGJz/A3l9KgY/YmDyAAAAAElFTkSuQmCC" style="display: block; margin: auto;" /></p>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 </div>
 <div id="save-graphics-as-pdf-or-jpeg" class="section level4">
 <h4>Save graphics as PDF or jpeg</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">workspace =<span class="st"> </span><span class="kw">getwd</span>()
 cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>),<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>)
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......</span>
 <span class="co">#&gt; </span>
@@ -586,6 +666,7 @@ cooccurNetwork =<span class="st"> </span><span class="kw">coocnet</span>(<span c
 <span class="co">#&gt; 2. creating network file (cooccurNetwork) ......completed</span>
 <span class="co">#&gt; </span>
 network_igraph =<span class="st"> </span><span class="kw">toigraph</span>(<span class="dt">networkFile=</span>cooccurNetwork$networkFile, <span class="dt">networkName=</span>cooccurNetwork$xnames)
+<span class="co">#&gt; </span>
 <span class="co">#save as PDF</span>
 <span class="kw">pdf</span>(<span class="dt">file=</span><span class="st">&quot;sample1.pdf&quot;</span>)
 <span class="kw">plot</span>(network_igraph[[<span class="dv">1</span>]])  
@@ -599,7 +680,7 @@ network_igraph =<span class="st"> </span><span class="kw">toigraph</span>(<span 
 <span class="co">#&gt; png </span>
 <span class="co">#&gt;   2</span>
 workspace
-<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpAVNyxa/Rbuild378824b746dc/cooccurNet/vignettes&quot;</span></code></pre></div>
+<span class="co">#&gt; [1] &quot;C:/Users/Jerry/AppData/Local/Temp/RtmpeM4K7n/Rbuild1d485ab04e90/cooccurNet/vignettes&quot;</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -620,7 +701,9 @@ workspace
 <p>The <strong>parameter</strong> <code>memory</code> indicates the type of matrix used in <strong>cooccurNet</strong>. It could be ‘memory’ or ‘sparse’. If it’s set to be ‘memory’, all data would be manipulated in the RAM by using normal matrix and package ‘bigmemory’. If it’s set to be ‘sparse’, the package “Matrix” would be used to manipulate massive matrices in memory and initialize huge sparse matrix, which could significantly reduce the RAM consumed. In default, it is set to be NULL, so that <strong>cooccurNet</strong> would determine automatically whether all data is manipulated in the RAM or not, according to the size of data inputted and the RAM available for R.</p>
 <p><strong>If your system has not enough RAM, you can set <code>memory='sparse'</code> to keep this program working properly.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cooccurNetwork  =<span class="st"> </span><span class="kw">coocnet</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">conservativeFilter=</span><span class="fl">0.95</span>, <span class="dt">cooccurFilter=</span><span class="fl">0.9</span>, <span class="dt">networkFile=</span><span class="st">'cooccurNetwork'</span>, <span class="dt">memory=</span><span class="st">'sparse'</span>)
-<span class="co">#&gt; reading file......completed. (10,329)</span>
+<span class="co">#&gt; reading file......</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; preprocess file......preprocess file......completed. (10,42)</span>
 <span class="co">#&gt; </span>
@@ -688,13 +771,14 @@ workspace
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">readseq</span>(<span class="dt">dataFile=</span><span class="kw">getexample</span>(<span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>), <span class="dt">dataType=</span><span class="st">&quot;protein&quot;</span>,<span class="dt">debug=</span><span class="ot">TRUE</span>)
 <span class="co">#&gt; Reading file......</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     reading sequence from file time cost:0.16 secs;memory applied:93.9 MB</span>
+<span class="co">#&gt;     reading sequence from file time cost:0.12 secs;memory applied:93.2 MB</span>
 <span class="co">#&gt; character level:A,C,D,E,F,G,H,I,K,L,M,N,P,Q,R,S,T,V,W,X,Y</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     split string to character time cost:0.69 secs;memory applied:94.1 MB</span>
+<span class="co">#&gt;     split string to character time cost:0.48 secs;memory applied:93.6 MB</span>
 <span class="co">#&gt; completed. (10,329)</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;     total co-occurrence.readsequence time cost:0.97 secs;memory applied:94.1 MB</span></code></pre></div>
+<span class="co">#&gt;     total co-occurrence.readsequence time cost:0.7 secs;memory applied:93.6 MB</span>
+<span class="co">#&gt; </span></code></pre></div>
 </div>
 </div>
 

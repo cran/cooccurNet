@@ -1,3 +1,7 @@
 2016-12-16 Yuanqiang Zou  <jerrytsou2001@gmail.com>
 
-	Document synchronization and testoutputs.
+	Document synchronization and test outputs.
+
+2017-01-10 Yuanqiang Zou  <jerrytsou2001@gmail.com>
+
+	Modifiy documentaion and import a new package "doParallel"
