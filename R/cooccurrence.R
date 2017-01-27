@@ -190,6 +190,9 @@ coocnet <-  function(dataFile="", dataType="protein", conservativeFilter=0.95, c
   threshold = conservativeFilter
   #memory=NA
   sequences <- cooccur.dataprepreprocess.preprocess(data=sequences,threshold=threshold, memory=memory, debug=debug)
+  if(is.null(nrow(sequences$matrix))){
+    return(sequences)
+  }
   cat(sprintf("preprocess file......completed. (%s,%s)",nrow(sequences$matrix),ncol(sequences$matrix)))
   message("")
 
@@ -273,6 +276,9 @@ siteco <-  function(dataFile="", dataType="protein", conservativeFilter=0.95, co
   threshold = conservativeFilter
 
   sequences <- cooccur.dataprepreprocess.preprocess(data=sequences,threshold=threshold, memory=memory, debug=debug)
+  if(is.null(nrow(sequences$matrix))){
+    return(sequences)
+  }
   cat(sprintf("preprocess file......completed. (%s,%s)",nrow(sequences$matrix),ncol(sequences$matrix)))
   message("")
 
@@ -294,6 +300,73 @@ siteco <-  function(dataFile="", dataType="protein", conservativeFilter=0.95, co
 
 }
 
+
+#toigraph_old <-  function(networkFile="", networkNames=c()){
+
+  #if(!requireNamespace("igraph", quietly = TRUE)){
+    #stop("Package 'igraph' is required.")
+  #}
+
+  #dataframe = read.csv(networkFile,sep=" ",header=FALSE,stringsAsFactors = FALSE)
+  #if( is.null(dataframe)){
+    #stop("the file is empty")
+  #}
+  #if(nrow(dataframe)==0){
+    #stop("the file is empty")
+  #}
+
+  #if(length(networkNames)==0){
+    #networkNames = dataframe[,1]
+  #}
+
+  #graphList = list()
+
+  #for(i in 1:length(networkNames)){
+    #networkName = networkNames[i]
+
+    #df = dataframe[which(dataframe[,1]==networkName),]
+    #if(nrow(df)==0){
+      #stop("the file does not contain the specified network.")
+      #graphList[[i]] = NA
+      #next
+    #}
+    #graphdf = matrix(ncol=3)
+    #for(rowid in  1:nrow(df)){
+      #rows = df[rowid,]
+      #NAME = as.character(rows[1])
+      #for (colid in  2:ncol(df)) {
+
+        #newRow = c()
+        #cols = as.character(rows[colid])
+        #print(NAME)
+        #print(cols)
+        #if(cols!=""){
+          #value = strsplit(cols,split="-")
+          #A = as.numeric(value[[1]][1])
+          #B = as.numeric(value[[1]][2])
+          #newRow =  c(NAME, A, B)
+          #print(c(NAME, A, B))
+          #graphdf =  rbind(c(NAME, A, B),graphdf)
+          #graphdf =  rbind(graphdf, c(NAME, A, B))
+        #}else{
+          #break
+        #}
+      #}
+    #}
+    #graphdf = na.omit(graphdf)
+
+    #graphdf = graphdf[which(graphdf[,1]==networkName),2:3]
+    #graphdf = igraph::graph.data.frame(d = graphdf, directed = FALSE)
+
+
+    #graphList[[i]] = graphdf
+
+  #}
+  #message("")
+  #return(graphList)
+#}
+
+
 #' @title toigraph
 #'
 #' @description transform a network file to the igraph.data.frame type by specifying a network file name and a network name
@@ -313,67 +386,72 @@ toigraph <-  function(networkFile="", networkNames=c()){
     stop("Package 'igraph' is required.")
   }
 
-  dataframe = read.csv(networkFile,sep=" ",header=FALSE,stringsAsFactors = FALSE)
-  if( is.null(dataframe)){
+
+  fo = file(networkFile,'r')
+  nodes <- readLines(fo)
+  close(fo)
+
+
+  if( is.null(nodes)){
     stop("the file is empty")
   }
-  if(nrow(dataframe)==0){
+  if(length(nodes)==0){
     stop("the file is empty")
   }
 
-  if(length(networkNames)==0){
-    networkNames = dataframe[,1]
-  }
 
   graphList = list()
-
-  for(i in 1:length(networkNames)){
-    networkName = networkNames[i]
-
-    df = dataframe[which(dataframe[,1]==networkName),]
-    if(nrow(df)==0){
-      #stop("the file does not contain the specified network.")
-      graphList[[i]] = NA
+  xxnames = c()
+  for(i in 1 : length(nodes)){
+    graphdf = matrix(ncol=3,nrow=0)
+    values = strsplit(nodes[i],split=" ")
+    values = values[[1]]
+    #print(values)
+    NAME = values[1]
+    xxnames = c(xxnames,NAME)
+    #print(NAME)
+    if(length(values)==1){
       next
     }
-    graphdf = matrix(ncol=3)
-    for(rowid in  1:nrow(df)){
-      rows = df[rowid,]
-      NAME = as.character(rows[1])
-      for (colid in  2:ncol(df)) {
+    for(j in 2:length(values) ){
+      xnodes = values[j]
+      value = strsplit(xnodes,split="-")
+      #print(value)
+      A = as.numeric(value[[1]][1])
+      B = as.numeric(value[[1]][2])
+      graphdf =  rbind(graphdf, c(NAME, A, B))
+    }
+    graphList[[i]] = graphdf
+  }
 
-        #newRow = c()
-        cols = as.character(rows[colid])
-        #print(NAME)
-        #print(cols)
-        if(cols!=""){
-          value = strsplit(cols,split="-")
-          A = as.numeric(value[[1]][1])
-          B = as.numeric(value[[1]][2])
-          #newRow =  c(NAME, A, B)
-          #print(c(NAME, A, B))
-          #graphdf =  rbind(c(NAME, A, B),graphdf)
-          graphdf =  rbind(graphdf, c(NAME, A, B))
-        }else{
-          break
+
+  if(length(networkNames)==0){
+    networkNames = xxnames
+  }
+
+  ggraphList = list()
+  for(x in 1:length(networkNames)){
+    networkName = networkNames[x]
+    for(y in 1:length(graphList)){
+      ggdf = graphList[[y]]
+      if(length(which(ggdf[,1]==networkName))>0){
+
+        ggdf = ggdf[which(ggdf[,1]==networkName),2:3]
+        if(is.vector(ggdf)){
+          xx = matrix(ncol=2,nrow=0)
+          ggdf =  rbind(xx, ggdf)
         }
+        ggdf = igraph::graph.data.frame(d = ggdf, directed = FALSE)
+        ggraphList[[x]] = ggdf
+      }else{
+        next
       }
     }
-    graphdf = na.omit(graphdf)
-
-    graphdf = graphdf[which(graphdf[,1]==networkName),2:3]
-    graphdf = igraph::graph.data.frame(d = graphdf, directed = FALSE)
-
-
-    graphList[[i]] = graphdf
-
   }
+
   message("")
-  return(graphList)
+  return(ggraphList)
 }
-
-
-
 
 
 #'getexample

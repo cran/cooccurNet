@@ -5,3 +5,7 @@
 2017-01-10 Yuanqiang Zou  <jerrytsou2001@gmail.com>
 
 	Modifiy documentaion and import a new package "doParallel"
+
+2017-01-27 Yuanqiang Zou  <jerrytsou2001@gmail.com>
+
+	Optimized the fuction "toigraph"

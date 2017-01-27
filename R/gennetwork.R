@@ -75,22 +75,28 @@ cooccur.gennetework.calculateNetWork <- function(sequences=list(),alpha=0.9,para
 	message("")
 	t = Sys.time()
 
-	#2016-11-16 begin
-	#df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences,alpha,steps,debug)
-	df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences, alpha, steps, parallel, debug)
+	#2017-01-11 begin
+	df_cooccurrence = data.frame()
+	if(!is.na(cooccurfile) | !is.na(rawfile) | !is.na(modulefile) | !is.na(propertyfile) | !is.na(networkpfile) ){
+	  #2016-11-16 begin
+	  #df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences,alpha,steps,debug)
+	  df_cooccurrence = cooccur.gennetework.cooccurnetworks(sequences, alpha, steps, parallel, debug)
 
-	#2016-11-16 end
+	  #2016-11-16 end
 
-	cooccur.printTimeCost('cooccur.gennetework.cooccurnetworks df_cooccurrence time cost',t, debug)
-	#2016-09-19
-	#print((df_cooccurrence))
+	  cooccur.printTimeCost('cooccur.gennetework.cooccurnetworks df_cooccurrence time cost',t, debug)
+	  #2016-09-19
+	  #print((df_cooccurrence))
 
-	#2016-08-31
-	#if(sequences$memory=="sparse") {
-		steps = steps + 1
-	#}
-	colnames(df_cooccurrence) =seq(1:ncol(df_cooccurrence))
-	rownames(df_cooccurrence) = seq(1:nrow(sequences$matrix))
+	  #2016-08-31
+	  #if(sequences$memory=="sparse") {
+	  steps = steps + 1
+	  #}
+	  colnames(df_cooccurrence) =seq(1:ncol(df_cooccurrence))
+	  rownames(df_cooccurrence) = seq(1:nrow(sequences$matrix))
+	}
+	#2017-01-11 end
+
 
   #print(paste(rawfile,"-rawfile",sep="--"))
 	if(!is.na(rawfile)){

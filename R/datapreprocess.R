@@ -85,6 +85,10 @@ cooccur.dataprepreprocess.preprocess <- function(data=list(), threshold=0.9, mem
   }
   #sfStop()
 
+  if(is.null(nrow(data$matrix))){
+    print("data$matrix is null after filteration")
+    return(data)
+  }
 
   inmemoryflag = inmemoryflag(nrow(data$matrix), ncol(data$matrix))
 

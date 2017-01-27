@@ -157,14 +157,18 @@ cooccur.networkpvalue.calculateNetWorkPvalue.new <- function(df_cooccurrence=NA,
     #cores = 3
     #cl <- makeCluster(cores)
     #registerDoParallel(cl)
-    if(cores$win==TRUE){
-      print("cl = parallel::makeCluster(cores$cpus)")
-      cl = parallel::makeCluster(cores$cpus)
-    }else{
-      print(paste("cores in use:",cores$cpus,sep=""))
-      print("cl = parallel::makeCluster(cores$cpus, type = 'FORK')")
-      cl = parallel::makeCluster(cores$cpus, type = "FORK")
-    }
+    #if(cores$win==TRUE){
+      #print("cl = parallel::makeCluster(cores$cpus)")
+      #cl = parallel::makeCluster(cores$cpus)
+    #}else{
+      #print(paste("cores in use:",cores$cpus,sep=""))
+      #print("cl = parallel::makeCluster(cores$cpus, type = 'FORK')")
+      #cl = parallel::makeCluster(cores$cpus, type = "FORK")
+    #}
+
+    print(paste("cores in use:",cores$cpus,sep=""))
+    print("cl = parallel::makeCluster(cores$cpus)")
+    cl = parallel::makeCluster(cores$cpus)
     doParallel::registerDoParallel(cl)
   }
 
@@ -179,7 +183,7 @@ cooccur.networkpvalue.calculateNetWorkPvalue.new <- function(df_cooccurrence=NA,
   #cooccurValues = cbind(cooccurValues, df_cooccurrence_vector)
   #2017-01-11 end
 
-  tryCatch({
+  #tryCatch({
     i = 0
     if(parallel==TRUE){
       #library(doParallel)
@@ -211,11 +215,11 @@ cooccur.networkpvalue.calculateNetWorkPvalue.new <- function(df_cooccurrence=NA,
     gc()
     return(pvalues)
 
-  }, error=function(e){
-      parallel::stopCluster(cl)
-      print(e)
-    }
-  )
+  #}, error=function(e){
+      #parallel::stopCluster(cl)
+      #print(e)
+    #}
+  #)
 
   gc()
 
@@ -253,7 +257,7 @@ cooccur.networkpvalue.dfcooccurrencevector <- function(shuffleMatrix,sequences,a
 
   nrow = nrow(shuffleMatrix)
 
-  colsperIter = 10
+  colsperIter = 5
   Iter = ceiling(len / colsperIter)
   start <- 1
   end <- 1
